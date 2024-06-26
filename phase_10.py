@@ -60,7 +60,7 @@ MCOMP_PHASE_X = COMP_HAND_X + HAND_X_SPACING
 RCOMP_PHASE_X = COMP_HAND_X + HAND_X_SPACING * 2
 
 # Card constants
-CARD_VALUES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "skip", "wild"]
+CARD_VALUES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "wild", "skip"]
 CARD_SUITS = ["blue", "green", "red", "yellow", "black"]
 
 # If we fan out cards stacked on each other, how far apart to fan them?
@@ -90,7 +90,7 @@ PHASE_PILE_8 = 13
 # PHASE_PILE_11 = 16
 # PHASE_PILE_12 = 17
 
-PHASE_NUMBER = {"1": "2 sets of 3", "2": "1 set of 3 + 1 run of 4", "3": "1 set of 4 + 1 run of 4", "4": "1 run of 7", "5": "1 run of 8", "6": "1 run of 9", "7": "2 sets of 4", "8": "7 cards of 1 color", "9": "1 set of 5 + 1 set of 2", "10": "1 set of 5 + 1 set of 3"}
+# PHASE_NUMBER = {"1": "2 sets of 3", "2": "1 set of 3 + 1 run of 4", "3": "1 set of 4 + 1 run of 4", "4": "1 run of 7", "5": "1 run of 8", "6": "1 run of 9", "7": "2 sets of 4", "8": "7 cards of 1 color", "9": "1 set of 5 + 1 set of 2", "10": "1 set of 5 + 1 set of 3"}
 # could make this list of the values, then enumerate list (start=1)
 
 # List of phases that require 1 or 2 mat piles
@@ -101,7 +101,7 @@ PHASE_2_MATS = [1, 2, 3, 7, 9, 10]
 class Card(arcade.Sprite):
     """ Card sprite """
 
-    def __init__(self, suit, value, scale=1):
+    def __init__(self, suit=0, value=0, scale=1):
         """ Card constructor """
 
         # Attributes for suit and value
@@ -109,7 +109,7 @@ class Card(arcade.Sprite):
         self.value = value
 
         # Image to use for the sprite when face up
-        self.image_file_name = f"./images/{self.suit}_cards/{self.suit}{self.value:0>2}.png"
+        self.image_file_name = f"./images/{CARD_SUITS[self.suit]}_cards/{CARD_SUITS[self.suit]}{(self.value + 1):0>2}.png"
         self.is_face_up = False
         super().__init__(FACE_DOWN_IMAGE, scale, hit_box_algorithm="None")
 
@@ -290,19 +290,19 @@ class MyGame(arcade.Window):
 
         # Create 2 of every numbered card
         for i in range(2):
-            for card_suit in CARD_SUITS[:4]:
-                for card_value in CARD_VALUES[:12]:
+            for card_suit in range(4):
+                for card_value in range(0, 12):
                     card = Card(card_suit, card_value, CARD_SCALE)
                     card.position = DECK_X, DECK_Y
                     self.card_list.append(card)
         # Create 8 wild cards
         for i in range(8):
-            wild_card = Card("black", "wild", CARD_SCALE)
+            wild_card = Card(4, 12, CARD_SCALE)
             wild_card.position = DECK_X, DECK_Y         
             self.card_list.append(wild_card)
         # Create 4 skip cards
         for i in range(4):
-            skip_card = Card("black", "skip", CARD_SCALE)
+            skip_card = Card(4, 13, CARD_SCALE)
             skip_card.position = DECK_X, DECK_Y 
             self.card_list.append(skip_card)
 
