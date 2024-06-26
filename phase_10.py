@@ -70,7 +70,7 @@ CARD_HORIZONTAL_OFFSET = CARD_WIDTH * CARD_SCALE * 0.4
 FACE_DOWN_IMAGE = "./images/card_back.png"
 
 # Constants that represent "what pile is what" for the game
-PILE_COUNT = 18
+PILE_COUNT = 14
 DECK_FACE_DOWN_PILE = 0
 DECK_FACE_UP_PILE = 1
 USER_HAND_PILE = 2
@@ -85,10 +85,13 @@ PHASE_PILE_5 = 10
 PHASE_PILE_6 = 11
 PHASE_PILE_7 = 12
 PHASE_PILE_8 = 13
-PHASE_PILE_9 = 14
-PHASE_PILE_10 = 15
-PHASE_PILE_11 = 16
-PHASE_PILE_12 = 17
+# PHASE_PILE_9 = 14
+# PHASE_PILE_10 = 15
+# PHASE_PILE_11 = 16
+# PHASE_PILE_12 = 17
+
+PHASE_NUMBER = {"1": "2 sets of 3", "2": "1 set of 3 + 1 run of 4", "3": "1 set of 4 + 1 run of 4", "4": "1 run of 7", "5": "1 run of 8", "6": "1 run of 9", "7": "2 sets of 4", "8": "7 cards of 1 color", "9": "1 set of 5 + 1 set of 2", "10": "1 set of 5 + 1 set of 3"}
+# could make this list of the values, then enumerate list (start=1)
 
 # List of phases that require 1 or 2 mat piles
 PHASE_1_MATS = [4, 5, 6, 8]
@@ -115,12 +118,14 @@ class Card(arcade.Sprite):
         t1 = f"{self.value:0>2}"
         t2 = f"{other.value:0>2}"
         return t1 < t2
+
+    def get_value(self):  ## maybe change numbered cards to integer?
+        """returns card value as a string"""
+        return self.value
     
-    def __cs__(self, other):
-        """seperates cards by color"""
-        c1 = self.suit
-        c2 = other.suit
-        return c1 < c2
+    def get_color(self):
+        """returns the color of card as string"""
+        return self.suit
 
     def face_down(self):
         """ Turn card face-down """
@@ -162,11 +167,14 @@ class MyGame(arcade.Window):
         # Create a list of lists, each holds a pile of cards.
         self.piles = None
 
+        # Create a list of the Phases.
+        self.phase_list = None
+
         # Keep track of phase
         self.phase = phase
-        self.user_phase = 4
+        self.user_phase = 1
         self.lcomp_phase = 1
-        self.mcomp_phase = 4
+        self.mcomp_phase = 1
         self.rcomp_phase = 1
 
         # Keep track of score
@@ -176,37 +184,62 @@ class MyGame(arcade.Window):
         self.mcomp_score = 0
         self.rcomp_score = 0
 
+        # Keep track of turn
+        self.user_turn = True
+        self.lcomp_turn = False
+        self.mcomp_turn = False
+        self.rcomp_turn = False
 
-    def create_phase_mats(self, pile, phase):
+        # Check if phase has been completed
+        self.user_phase_complete = False
+        self.lcomp_phase_complete = False
+        self.mcomp_phase_complete = False
+        self.r_comp_phase_complete = False
+
+
+    def add_score(self, player):
+        """at end of round, add the point total for each card remaining in hand to total score."""
+        self.player = player
+        for card in player.hand:
+            if card in CARD_VALUES[:9]:
+                player.score += 5
+            elif card in CARD_VALUES[10:12]:
+                player.score += 10
+            elif card == CARD_VALUES[13]:
+                player.score += 15
+            else:
+                player.score += 25    
+
+    def create_phase_mats(self, pile_x, phase):
         """ creates the play/phase piles for each player = user, lcomp, mcomp, or rcomp
         either one or two piles based on which phase they are on """
-        self.pile = pile
+        self.pile_x = pile_x
         self.phase = phase
         # create phase mats for user
-        if self.pile == USER_HAND_X:
+        if self.pile_x == USER_HAND_X:
             # one phase mat
             if self.phase in PHASE_1_MATS:
                 pile = arcade.SpriteSolidColor(PHASE_1_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.BLUE)
-                pile.position = self.pile, BOTTOM_PHASE_Y
+                pile.position = self.pile_x, BOTTOM_PHASE_Y
                 self.pile_mat_list.append(pile)
             # two phase mats
             elif self.phase in PHASE_2_MATS:
                 for i in range(2):
                     pile = arcade.SpriteSolidColor(PHASE_2_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.YELLOW)
-                    pile.position = (self.pile - .034 * HAND_MAT_WIDTH - PHASE_2_MAT_WIDTH / 2) + i * PHASE_2_X_SPACING, BOTTOM_PHASE_Y
+                    pile.position = (self.pile_x - .034 * HAND_MAT_WIDTH - PHASE_2_MAT_WIDTH / 2) + i * PHASE_2_X_SPACING, BOTTOM_PHASE_Y
                     self.pile_mat_list.append(pile)
         # create phase mats for the 3 computers
         else:
             # One phase mat
             if self.phase in PHASE_1_MATS:
                 pile = arcade.SpriteSolidColor(PHASE_1_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.BLUE)
-                pile.position = self.pile, TOP_PHASE_Y
+                pile.position = self.pile_x, TOP_PHASE_Y
                 self.pile_mat_list.append(pile)
             # Two phase mats
             elif self.phase in PHASE_2_MATS:
                 for i in range(2):
                     pile = arcade.SpriteSolidColor(PHASE_2_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.YELLOW)
-                    pile.position = (self.pile - .034 * HAND_MAT_WIDTH - PHASE_2_MAT_WIDTH / 2) + i * PHASE_2_X_SPACING, TOP_PHASE_Y
+                    pile.position = (self.pile_x - .034 * HAND_MAT_WIDTH - PHASE_2_MAT_WIDTH / 2) + i * PHASE_2_X_SPACING, TOP_PHASE_Y
                     self.pile_mat_list.append(pile)
 
     def setup(self):
@@ -262,16 +295,17 @@ class MyGame(arcade.Window):
                     card = Card(card_suit, card_value, CARD_SCALE)
                     card.position = DECK_X, DECK_Y
                     self.card_list.append(card)
-        # Create 4 skip cards
-        for i in range(4):
-            skip_card = Card("black", "skip", CARD_SCALE)
-            skip_card.position = DECK_X, DECK_Y 
-            self.card_list.append(skip_card)
         # Create 8 wild cards
         for i in range(8):
             wild_card = Card("black", "wild", CARD_SCALE)
             wild_card.position = DECK_X, DECK_Y         
             self.card_list.append(wild_card)
+        # Create 4 skip cards
+        for i in range(4):
+            skip_card = Card("black", "skip", CARD_SCALE)
+            skip_card.position = DECK_X, DECK_Y 
+            self.card_list.append(skip_card)
+
 
         # Shuffle the cards
         for pos1 in range(len(self.card_list)):
@@ -340,6 +374,7 @@ class MyGame(arcade.Window):
         self.piles[DECK_FACE_UP_PILE].append(card)
         card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position
 
+
     # def sort(self):
     #     self.card_list.sort()       
 
@@ -386,13 +421,14 @@ class MyGame(arcade.Window):
                 # Flip face up
                 card.face_up()
                 # Move card position to discard/face-up pile
-                card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position
+                card.position = self.pile_mat_list[USER_HAND_PILE].position
                 # Remove card from face down pile
                 self.piles[DECK_FACE_DOWN_PILE].remove(card)
                 # Move card to face up list
-                self.piles[DECK_FACE_UP_PILE].append(card)
+                self.piles[USER_HAND_PILE].append(card)
                 # Put on top draw-order wise
-                self.pull_to_top(card)
+                # self.pull_to_top(card)
+                self.sort_pile(USER_HAND_PILE)
 
             else:
                 # All other cases, grab the face-up card we are clicking on
@@ -480,6 +516,220 @@ class MyGame(arcade.Window):
         if pile_index != DECK_FACE_UP_PILE:
             self.sort_pile(pile_index)
 
+    ### this will be more for future AI code to check phase piles for each comp
+    def determine_phase_piles(self):  ## don't need as new func, just add code to setup?
+        if self.user_phase in PHASE_1_MATS:  ## - play pile func?
+            self.user_phase_pile = self.pile_mat_list[PHASE_PILE_1]
+            last_user_pile = PHASE_PILE_1
+        elif self.user_phase in PHASE_2_MATS:
+            self.user_phase_pile_b = self.pile_mat_list[PHASE_PILE_1]
+            self.user_phase_pile = self.pile_mat_list[PHASE_PILE_2]
+            last_user_pile = PHASE_PILE_2
+
+        if self.lcomp_phase in PHASE_1_MATS:
+            self.lcomp_phase_pile = self.pile_mat_list[last_user_pile + 1]
+            last_lcomp_pile = last_user_pile + 1
+        elif self.lcomp_phase in PHASE_2_MATS:
+            self.lcomp_phase_pile_b = self.pile_mat_list[last_user_pile + 1]
+            self.lcomp_phase_pile = self.pile_mat_list[last_user_pile + 2]
+            last_lcomp_pile = last_user_pile + 2
+
+        if self.mcomp_phase in PHASE_1_MATS:
+            self.mcomp_phase_pile = self.pile_mat_list[last_lcomp_pile + 1]
+            last_mcomp_pile = last_lcomp_pile + 1
+        elif self.mcomp_phase in PHASE_2_MATS:
+            self.mcomp_phase_pile_b = self.pile_mat_list[last_lcomp_pile + 1]
+            self.mcomp_phase_pile = self.pile_mat_list[last_lcomp_pile + 2] 
+            last_mcomp_pile = last_lcomp_pile + 2
+
+        if self.rcomp_phase in PHASE_1_MATS:
+            self.rcomp_phase_pile = self.pile_mat_list[last_mcomp_pile + 1]
+        elif self.rcomp_phase in PHASE_2_MATS:
+            self.rcomp_phase_pile_b = self.pile_mat_list[last_mcomp_pile + 1]
+            self.rcomp_phase_pile = self.pile_mat_list[last_mcomp_pile + 2]
+
+
+    def check_set(self, amount, pile):#, complete=False):  # elim complete?
+        """check to see if cards in phase pile meets the phase requirement for a set.
+        amount = number of cards with same value needed to complete phase
+        pile = the list of cards in the phase pile being checked
+        returns bool"""
+        self.amount = amount
+        self.pile = pile
+        # self.complete = complete # elim complete?
+        # get first card value other than wild or skip
+        while True:
+            n = 0
+            card_1 = self.pile[n]
+            if card_1.getsuit() == "black":
+                n += 1
+            else:
+                break
+        # create an empty result list for acceptable cards and bad list for invalid cards
+        res = []
+        bad = []
+        for card in self.pile:
+            if card.get_value() == "wild":
+                self.amount -= 1
+            elif card.get_value() == card_1.get_value():   ### need to add if card != value it's false, return to hand
+                    res.append(card)
+            else:
+                bad.append(card)
+        return len(res) >= self.amount and len(bad) == 0
+        # if len(res) >= self.amount and len(bad) == 0:  # take out of for loop?
+        #     # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)  ### maybe return player_phase_complete = True, and remove complete parameter
+        #     # hit_on_set = True  --for future 'hitting' func
+        #     return True
+        # else:
+        #     # self.complete = False
+        #     return False
+
+        ### if phase == 1:
+        ### if check_set(3, phase pile 1) and check_set(3, phase pile 2):
+                ###phase 1 = True. or self.user_phase_complete = True, self.user_phase +1
+
+        ### if check_set(3, phase pile 1, True) and check_set(3, phase pile 2, True):
+                ###phase 1 = True. or self.user_phase_complete = True, self.user_phase +1
+    
+    def check_color(self, amount, pile):#, complete=False):
+        """ checks to see if all cards in pile has same color. returns bool.  """
+        self.amount = amount
+        self.pile = pile
+        # self.complete = complete
+        # get first card color, other than wild
+        while True:
+            n = 0
+            card_1 = self.pile[n]
+            if card_1.getsuit() == "black":
+                n += 1
+                continue
+            else:
+                break
+        # create an empty result list for acceptable cards and bad list for invalid cards
+        res = []
+        bad = []
+        for card in self.pile:
+            # if card == Card("black", "wild", CARD_SCALE):
+            #     self.amount -= 1
+            if card.get_value() == "wild":
+                self.amount -= 1
+            elif card.get_suit() == card_1.get_suit():   ### need to add if card != suit it's false, return to hand
+                    res.append(card)
+            else:
+                bad.append(card)
+        if len(res) >= self.amount and len(bad) == 0:
+            # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)
+            # hit_on_color = True  --for future 'hitting' func
+            return True
+        else:
+            # self.complete = False
+            return False
+
+    def check_run(self, amount, pile):#, complete=False):
+        self.amount = amount
+        self.pile = pile
+        # self.complete = complete
+        # create an empty result list for acceptable cards and bad list for invalid cards        
+        res = []
+        bad = []
+        for card in self.pile:  ### need to change value of wild card when adding into run.
+            if len(res) > 0:
+                start_card = res[0]
+                prev_card = res[-1]
+                if card.getvalue() == "skip":
+                    bad.append(card)
+                elif prev_card.getvalue() == "wild": #and len(res) == 1:
+                    res.append(card)
+                ### change below to -- elif: card.getvalue().isdigit() --- change else: to return False/put cards back (because of skip)
+                elif card.getvalue() == "wild" or int(card.getvalue()) == (int(prev_card.getvalue()) + 1):
+                        res.append(card)
+                else:
+                    bad.append(card)
+            else:
+                if card.getvalue() == "skip":
+                    bad.append(card)
+                else:
+                    res.append(card)
+        if len(res) >= self.amount and len(bad) == 0:
+            # hit_on_run = True  --for future 'hitting' func
+            return True
+        else:
+            return False
+
+    def check_phase_complete(self, phase): # for user  # ex: check_phase_complete(self.user_phase)
+        self.phase = phase
+        if self.phase in PHASE_1_MATS:
+            phase_pile = self.pile_mat_list[PHASE_PILE_1]
+        elif self.phase in PHASE_2_MATS:
+            phase_pile_b = self.pile_mat_list[PHASE_PILE_1]
+            phase_pile = self.pile_mat_list[PHASE_PILE_2]
+
+        if self.phase == 1:
+            if self.check_set(3, phase_pile_b) and self.check_set(3, phase_pile):
+                # self.phase_complete = True
+                # self.phase += 1  -- maybe put at round end? if check_phase_complete = True, self.phase += 1
+                # hit_on_set = True  -- phase_pile_b.hit_on_set() phase_pile.hit_on_set()
+                return True
+            else:
+                # self.phase_complete = False
+                return False
+
+        elif self.phase == 2:
+            if (self.check_set(3, phase_pile) and self.check_run(4, phase_pile_b)) or (self.check_set(3, phase_pile_b) and self.check_run(4, phase_pile)):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 3:
+            if (self.check_set(4, phase_pile) and self.check_run(4, phase_pile_b)) or (self.check_set(4, phase_pile_b) and self.check_run(4, phase_pile)):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 4:
+            if self.check_run(7, phase_pile):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 5:
+            if self.check_run(8, phase_pile):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 6:
+            if self.check_run(9, phase_pile):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 7:
+            if self.check_set(4, phase_pile_b) and self.check_set(4, phase_pile):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 8:
+            if self.check_color(7, phase_pile):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 9:
+            if (self.check_set(5, phase_pile) and self.check_set(2, phase_pile_b)) or (self.check_set(5, phase_pile_b) and self.check_set(2, phase_pile)):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+        elif self.phase == 10:
+            if (self.check_set(5, phase_pile) and self.check_set(3, phase_pile_b)) or (self.check_set(5, phase_pile_b) and self.check_set(3, phase_pile)):
+                self.phase_complete = True
+            else:
+                self.phase_complete = False
+
+
+    
     def on_mouse_release(self, x: float, y: float, button: int,
                          modifiers: int):
         """ Called when the user presses a mouse button. """
@@ -503,8 +753,8 @@ class MyGame(arcade.Window):
                 # If so, who cares. We'll just reset our position.
                 pass
 
-            # Is it on user hand pile?
-            elif pile_index == USER_HAND_PILE:
+            # Is it on a hand pile?
+            elif USER_HAND_PILE <= pile_index <= RCOMP_HAND_PILE:
                 # Are there already cards there?
                 if len(self.piles[pile_index]) > 0:
                     # Move cards to proper position
@@ -519,7 +769,7 @@ class MyGame(arcade.Window):
                         dropped_card.position = pile.center_x - (CARD_HORIZONTAL_OFFSET * 9) / 2, \
                                                 pile.center_y
                 # Sort pile by card value
-                self.sort_pile(USER_HAND_PILE)
+                self.sort_pile(pile_index)
                 for card in self.held_cards:
                     # Cards are in the right position, but we need to move them to the right list
                     self.move_card_to_new_pile(card, pile_index)
@@ -528,7 +778,7 @@ class MyGame(arcade.Window):
                 reset_position = False
 
             # Release on phase pile?
-            elif PHASE_PILE_1 <= pile_index <= PHASE_PILE_12:
+            elif PHASE_PILE_1 <= pile_index <= PHASE_PILE_8:
                 if len(self.piles[pile_index]) > 0:
                     # Move cards to proper position
                     top_card = self.piles[pile_index][-1]
@@ -576,6 +826,7 @@ class MyGame(arcade.Window):
                     self.move_card_to_new_pile(card, pile_index)
                 
                 reset_position = False
+                # add change to turn flag
             
 
         if reset_position:
@@ -587,6 +838,9 @@ class MyGame(arcade.Window):
         # We are no longer holding cards
         self.held_cards = []
 
+    
+    
+    
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         """ User moves mouse """
 
