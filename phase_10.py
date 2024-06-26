@@ -119,12 +119,12 @@ class Card(arcade.Sprite):
         t2 = f"{other.value:0>2}"
         return t1 < t2
 
-    def get_value(self):  ## maybe change numbered cards to integer?
-        """returns card value as a string"""
-        return self.value
+    def get_value(self):
+        """returns card value"""
+        return f"{self.value:0>2}"
     
     def get_color(self):
-        """returns the color of card as string"""
+        """returns the color of card"""
         return self.suit
 
     def face_down(self):
@@ -454,6 +454,11 @@ class MyGame(arcade.Window):
                         self.piles[DECK_FACE_UP_PILE].remove(card)
                         self.piles[DECK_FACE_DOWN_PILE].append(card)
                         card.position = self.pile_mat_list[DECK_FACE_DOWN_PILE].position
+                    # flip over top card
+                    card = self.piles[DECK_FACE_DOWN_PILE].pop()
+                    card.face_up()
+                    self.piles[DECK_FACE_UP_PILE].append(card)
+                    card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position                    
 
             # --- add buttons here? ---
     
