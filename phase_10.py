@@ -5,6 +5,7 @@ from typing import Optional
 
 import random
 import arcade
+from player_class import Player
 
 # Screen title and size
 SCREEN_WIDTH = 1360
@@ -79,19 +80,13 @@ MCOMP_HAND_PILE = 4
 RCOMP_HAND_PILE = 5
 PHASE_PILE_1 = 6
 PHASE_PILE_2 = 7
+## might not need rest
 PHASE_PILE_3 = 8
 PHASE_PILE_4 = 9
 PHASE_PILE_5 = 10
 PHASE_PILE_6 = 11
 PHASE_PILE_7 = 12
 PHASE_PILE_8 = 13
-# PHASE_PILE_9 = 14
-# PHASE_PILE_10 = 15
-# PHASE_PILE_11 = 16
-# PHASE_PILE_12 = 17
-
-# PHASE_NUMBER = {"1": "2 sets of 3", "2": "1 set of 3 + 1 run of 4", "3": "1 set of 4 + 1 run of 4", "4": "1 run of 7", "5": "1 run of 8", "6": "1 run of 9", "7": "2 sets of 4", "8": "7 cards of 1 color", "9": "1 set of 5 + 1 set of 2", "10": "1 set of 5 + 1 set of 3"}
-# could make this list of the values, then enumerate list (start=1)
 
 # List of phases that require 1 or 2 mat piles
 PHASE_1_MATS = [4, 5, 6, 8]
@@ -121,7 +116,7 @@ class Card(arcade.Sprite):
 
     def get_value(self):
         """returns card value"""
-        return f"{self.value:0>2}"
+        return f"{self.value:0>2}"  # check if need (self.value + 1)
     
     def get_color(self):
         """returns the color of card"""
@@ -142,11 +137,14 @@ class Card(arcade.Sprite):
         """ Is this card face down? """
         return not self.is_face_up
 
-
+user = Player("user", True)
+lcomp = Player("lcomp")
+mcomp = Player("mcomp")
+rcomp = Player("rcomp")
 class MyGame(arcade.Window):
     """ Main application class. """
 
-    def __init__(self, phase= 1, score= 0):
+    def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
         # Sprite list with all the cards, no matter what pile they are in.
@@ -167,48 +165,53 @@ class MyGame(arcade.Window):
         # Create a list of lists, each holds a pile of cards.
         self.piles = None
 
-        # Create a list of the Phases.
-        self.phase_list = None
+        # Create players.
+        # user = Player("user", True)
+        # lcomp = Player("lcomp")
+        # mcomp = Player("mcomp")
+        # rcomp = Player("rcomp")
 
-        # Keep track of phase
-        self.phase = phase
-        self.user_phase = 1
-        self.lcomp_phase = 1
-        self.mcomp_phase = 1
-        self.rcomp_phase = 1
+        # self.phase_list = None
 
-        # Keep track of score
-        self.score = score
-        self.user_score = 0
-        self.lcomp_score = 0
-        self.mcomp_score = 0
-        self.rcomp_score = 0
+        # # Keep track of phase
+        # self.phase = phase
+        # self.user_phase = 1
+        # self.lcomp_phase = 4
+        # self.mcomp_phase = 1
+        # self.rcomp_phase = 4
 
-        # Keep track of turn
-        self.user_turn = True
-        self.lcomp_turn = False
-        self.mcomp_turn = False
-        self.rcomp_turn = False
+        # # Keep track of score
+        # self.score = score
+        # self.user_score = 0
+        # self.lcomp_score = 0
+        # self.mcomp_score = 0
+        # self.rcomp_score = 0
 
-        # Check if phase has been completed
-        self.user_phase_complete = False
-        self.lcomp_phase_complete = False
-        self.mcomp_phase_complete = False
-        self.r_comp_phase_complete = False
+        # # Keep track of turn
+        # self.user_turn = True
+        # self.lcomp_turn = False
+        # self.mcomp_turn = False
+        # self.rcomp_turn = False
+
+        # # Check if phase has been completed
+        # self.user_phase_complete = False
+        # self.lcomp_phase_complete = False
+        # self.mcomp_phase_complete = False
+        # self.r_comp_phase_complete = False
 
 
-    def add_score(self, player):
-        """at end of round, add the point total for each card remaining in hand to total score."""
-        self.player = player
-        for card in player.hand:
-            if card in CARD_VALUES[:9]:
-                player.score += 5
-            elif card in CARD_VALUES[10:12]:
-                player.score += 10
-            elif card == CARD_VALUES[13]:
-                player.score += 15
-            else:
-                player.score += 25    
+    # def add_score(self, player):
+    #     """at end of round, add the point total for each card remaining in hand to total score."""
+    #     self.player = player
+    #     for card in player.hand:
+    #         if card in CARD_VALUES[:9]:
+    #             player.score += 5
+    #         elif card in CARD_VALUES[10:12]:
+    #             player.score += 10
+    #         elif card == CARD_VALUES[13]:
+    #             player.score += 15
+    #         else:
+    #             player.score += 25    
 
     def create_phase_mats(self, pile_x, phase):
         """ creates the play/phase piles for each player = user, lcomp, mcomp, or rcomp
@@ -278,11 +281,17 @@ class MyGame(arcade.Window):
             self.pile_mat_list.append(pile)
 
         # Create the Phase piles
-        self.create_phase_mats(USER_HAND_X, self.user_phase)
-        self.create_phase_mats(LCOMP_PHASE_X, self.lcomp_phase)
-        self.create_phase_mats(MCOMP_PHASE_X, self.mcomp_phase)
-        self.create_phase_mats(RCOMP_PHASE_X, self.rcomp_phase)
+        self.create_phase_mats(USER_HAND_X, user.phase)
+        self.create_phase_mats(LCOMP_PHASE_X, lcomp.phase)
+        self.create_phase_mats(MCOMP_PHASE_X, mcomp.phase)
+        self.create_phase_mats(RCOMP_PHASE_X, rcomp.phase)
 
+        # assign phase piles to players
+        user.determine_phase_piles(self.pile_mat_list)
+        lcomp.determine_phase_piles(self.pile_mat_list)
+        mcomp.determine_phase_piles(self.pile_mat_list)
+        rcomp.determine_phase_piles(self.pile_mat_list)
+        
         # --- Create, shuffle, and deal the cards
 
         # Sprite list with all the cards, no matter what pile they are in.
@@ -305,7 +314,6 @@ class MyGame(arcade.Window):
             skip_card = Card(4, 13, CARD_SCALE)
             skip_card.position = DECK_X, DECK_Y 
             self.card_list.append(skip_card)
-
 
         # Shuffle the cards
         for pos1 in range(len(self.card_list)):
@@ -372,11 +380,7 @@ class MyGame(arcade.Window):
         card = self.piles[DECK_FACE_DOWN_PILE].pop()
         card.face_up()
         self.piles[DECK_FACE_UP_PILE].append(card)
-        card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position
-
-
-    # def sort(self):
-    #     self.card_list.sort()       
+        card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position   
 
     def on_draw(self):
         """ Render the screen. """
@@ -496,7 +500,6 @@ class MyGame(arcade.Window):
             # Put on top in order added
             self.pull_to_top(card)
     
-
     def remove_card_from_pile(self, card):
         """ Remove card from whatever pile it was in. """
         for pile in self.piles:
@@ -507,7 +510,6 @@ class MyGame(arcade.Window):
                 pile.remove(card)
                 self.sort_pile(self.piles.index(pile))
             
-
     def get_pile_for_card(self, card):
         """ What pile is this card in? """
         for index, pile in enumerate(self.piles):
@@ -805,7 +807,6 @@ class MyGame(arcade.Window):
                             dropped_card.position = pile.center_x - (CARD_HORIZONTAL_OFFSET * 4) / 2, \
                                                 pile.center_y
 
-                # self.pull_to_top(self.held_cards[-1])
                 # Sort pile by value
                 self.sort_pile(pile_index)
                 # Move card to card list
