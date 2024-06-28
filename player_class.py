@@ -108,13 +108,14 @@ class Player:
                     res.append(card)
             else:
                 bad.append(card)
-        if len(res) >= self.amount and len(bad) == 0:
-            # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)
-            # hit_on_color = True  --for future 'hitting' func
-            return True
-        else:
-            # self.complete = False
-            return False
+        return len(res) >= self.amount and len(bad) == 0
+        # if len(res) >= self.amount and len(bad) == 0:
+        #     # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)
+        #     # hit_on_color = True  --for future 'hitting' func
+        #     return True
+        # else:
+        #     # self.complete = False
+        #     return False
 
     def check_run(self, amount, pile):
         self.amount = amount
@@ -146,72 +147,86 @@ class Player:
         else:
             return False
 
-    def check_phase_complete(self):
+    def phase_complete(self):
         if self.phase == 1:
-            if self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile):
-                # hit_on_set = True  -- phase_pile_b.hit_on_set() phase_pile.hit_on_set()
-                return True
-            else:
-                # self.phase_complete = False
-                return False
+            return self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile)
+            # if self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile):
+            #     # hit_on_set = True  -- phase_pile_b.hit_on_set() phase_pile.hit_on_set()
+            #     return True
+            # else:
+            #     # self.phase_complete = False
+            #     return False
 
         elif self.phase == 2:
-            if (self.check_set(3, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
-                or (self.check_set(3, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return (self.check_set(3, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
+                or (self.check_set(3, self.phase_pile_b) and self.check_run(4, self.phase_pile))
+            # if (self.check_set(3, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
+            #     or (self.check_set(3, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 3:
-            if (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
-                or (self.check_set(4, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
+                or (self.check_set(4, self.phase_pile_b) and self.check_run(4, self.phase_pile))
+            # if (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
+            #     or (self.check_set(4, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 4:
-            if self.check_run(7, self.phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return self.check_run(7, self.phase_pile)
+            # if self.check_run(7, self.phase_pile):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 5:
-            if self.check_run(8, self.phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return self.check_run(8, self.phase_pile)
+            # if self.check_run(8, self.phase_pile):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 6:
-            if self.check_run(9, self.phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return self.check_run(9, self.phase_pile)
+            # if self.check_run(9, self.phase_pile):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 7:
-            if self.check_set(4, self.phase_pile_b) and self.check_set(4, self.phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return self.check_set(4, self.phase_pile_b) and self.check_set(4, self.phase_pile)
+            # if self.check_set(4, self.phase_pile_b) and self.check_set(4, self.phase_pile):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 8:
-            if self.check_color(7, self.phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return self.check_color(7, self.phase_pile)
+            # if self.check_color(7, self.phase_pile):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 9:
-            if (self.check_set(5, self.phase_pile) and self.check_set(2, self.phase_pile_b))\
-                or (self.check_set(5, self.phase_pile_b) and self.check_set(2, self.phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return (self.check_set(5, self.phase_pile) and self.check_set(2, self.phase_pile_b))\
+                or (self.check_set(5, self.phase_pile_b) and self.check_set(2, self.phase_pile))
+            # if (self.check_set(5, self.phase_pile) and self.check_set(2, self.phase_pile_b))\
+            #     or (self.check_set(5, self.phase_pile_b) and self.check_set(2, self.phase_pile)):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
         elif self.phase == 10:
-            if (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
-                or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
+            return (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
+                or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile))
+            # if (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
+            #     or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile)):
+            #     self.phase_complete = True
+            # else:
+            #     self.phase_complete = False
 
     def add_score(self, player):
         """at end of round, add the point total for each card remaining in hand to total score."""
