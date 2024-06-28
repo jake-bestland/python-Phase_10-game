@@ -11,15 +11,11 @@ class Player:
         self.phase = phase
         self.phase_complete = phase_complete
         self.score = score
-        # self.phase_pile_mat_list = None
         self.phase_pile = None
         self.phase_pile_b = None
 
-  
-
     def determine_phase_piles(self, pile_mat_list):  ## don't need as new func, just add code to setup?
         self.pile_mat_list = pile_mat_list
-        # self.phase_pile_mat_list: arcade.SpriteList = arcade.SpriteList()
 
         if self.name == "user":
             if self.phase in PHASE_1_MATS:  ## - play pile func?
@@ -66,7 +62,7 @@ class Player:
         while True:
             n = 0
             card_1 = self.pile[n]
-            if card_1.getsuit() == "black":   ## change to Card.card_1.getsuit()?
+            if card_1.getsuit() == "black":   ## change to card_1 == Card("black", "wild", CARD_SCALE) or card_1 == Card("black", "skip", CARD_SCALE)
                 n += 1
             else:
                 break
@@ -88,13 +84,6 @@ class Player:
         # else:
         #     # self.complete = False
         #     return False
-
-        ### if phase == 1:
-        ### if check_set(3, phase pile 1) and check_set(3, phase pile 2):
-                ###phase 1 = True. or self.user_phase_complete = True, self.user_phase +1
-
-        ### if check_set(3, phase pile 1, True) and check_set(3, phase pile 2, True):
-                ###phase 1 = True. or self.user_phase_complete = True, self.user_phase +1
 
     def check_color(self, amount, pile):
         """ checks to see if all cards in pile has same color. returns bool.  """
@@ -128,10 +117,9 @@ class Player:
             # self.complete = False
             return False
 
-    def check_run(self, amount, pile):#, complete=False):
+    def check_run(self, amount, pile)
         self.amount = amount
         self.pile = pile
-        # self.complete = complete
         # create an empty result list for acceptable cards and bad list for invalid cards        
         res = []
         bad = []
@@ -159,8 +147,9 @@ class Player:
         else:
             return False
 
-    def check_phase_complete(self, phase): # for user  # ex: check_phase_complete(self.user_phase)
+    def check_phase_complete(self, phase, pile_mat_list):
         self.phase = phase
+        self.pile_mat_list = pile_mat_list
         if self.phase in PHASE_1_MATS:
             phase_pile = self.pile_mat_list[PHASE_PILE_1]
         elif self.phase in PHASE_2_MATS:
@@ -255,68 +244,3 @@ class Comp(Player):
         super().__init__(name, turn, phase, phase_complete, score)
 
     ##add func to figure out phase piles
-
-################
-
-# class Player:
-#     def __init__(self, name):
-#         self.name = name
-#     def user(self, phase, score, hand=con.USER_HAND_PILE,): #play piles? - as func?
-#         self.phase = phase
-#         self.score = score
-#         self.hand = hand
-#         if self.phase in con.PHASE_1_MATS:  ## - play pile func?
-#             self.user_phase_pile = self.pile_mat_list[con.PHASE_PILE_1]
-#         else:
-#             self.user_phase_pile_b = self.pile_mat_list[con.PHASE_PILE_1]
-#             self.user_phase_pile = self.pile_mat_list[con.PHASE_PILE_2]
-#         if self.phase == 1:
-#             self.check_set(3, self.user_phase_pile_b)
-#             self.check_set(3, self.user_phase_pile)
-#         # if self.user_phase_pile_1.complete and if self.user_phase_pile.complete        ### check on mouse release on discard pile
-#         #       self.user_phase += 1
-#         # else:
-#         #       continue? or self.user_turn = False.... self.lcomp_turn = True
-
-    
-#     def l_comp(self, phase, score, hand=con.LCOMP_HAND_PILE):
-#         self.phase = phase
-#         self.score = score
-#         self.hand = hand
-#         if self.phase in con.PHASE_1_MATS:
-#             self.lcomp_phase_pile = self.pile_mat_list[self.user_phase_pile + 1]
-#         else:
-#             self.lcomp_phase_pile_b = self.pile_mat_list[self.user_phase_pile + 1]
-#             self.lcomp_phase_pile = self.pile_mat_list[self.lcomp_phase_pile_b + 1]
-
-
-#     def m_comp(self, phase, score, hand=con.MCOMP_HAND_PILE):
-#         self.phase = phase
-#         self.score = score
-#         self.hand = hand
-#         if self.phase in con.PHASE_1_MATS:
-#             self.mcomp_phase_pile = self.pile_mat_list[self.lcomp_phase_pile + 1]
-#         else:
-#             self.mcomp_phase_pile_b = self.pile_mat_list[self.lcomp_phase_pile + 1]
-#             self.mcomp_phase_pile = self.pile_mat_list[self.mcomp_phase_pile_b + 1]       
-
-#     def r_comp(self, phase, score, hand=con.RCOMP_HAND_PILE):
-#         self.phase = phase
-#         self.score = score
-#         self.hand = hand
-#         if self.phase in con.PHASE_1_MATS:
-#             self.rcomp_phase_pile = self.pile_mat_list[self.lcomp_phase_pile + 1]
-#         else:
-#             self.rcomp_phase_pile_b = self.pile_mat_list[self.user_phase_pile + 1]
-#             self.rcomp_phase_pile = self.pile_mat_list[self.rcomp_phase_pile_b + 1]
-
-
-# self.piles[con.USER_HAND_PILE]
-# self.piles[con.LCOMP_HAND_PILE]
-# self.piles[con.MCOMP_HAND_PILE]
-# self.piles[con.RCOMP_HAND_PILE]
-
-        # if self.user_phase_pile_1.complete and if self.user_phase_pile.complete        ### check on mouse release on discard pile
-        #       self.user_phase += 1
-        # else:
-        #       continue? or self.user_turn = False.... self.lcomp_turn = True
