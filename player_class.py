@@ -5,20 +5,19 @@ from phase_10 import Card
 # card_class = Card()
 
 class Player:
-    def __init__(self, name, turn=False, phase=1, phase_complete=False, score=0):
+    def __init__(self, name, turn=False, phase=1, score=0):
         self.name = name
         self.turn = turn
         self.phase = phase
-        self.phase_complete = phase_complete
         self.score = score
         self.phase_pile = None
         self.phase_pile_b = None
 
-    def determine_phase_piles(self, pile_mat_list):  ## don't need as new func, just add code to setup?
+    def determine_phase_piles(self, pile_mat_list):
         self.pile_mat_list = pile_mat_list
 
         if self.name == "user":
-            if self.phase in PHASE_1_MATS:  ## - play pile func?
+            if self.phase in PHASE_1_MATS:
                 self.phase_pile = self.pile_mat_list[PHASE_PILE_1]
                 last_user_pile = self.pile_mat_list[PHASE_PILE_1]
             elif self.phase in PHASE_2_MATS:
@@ -62,7 +61,7 @@ class Player:
         while True:
             n = 0
             card_1 = self.pile[n]
-            if card_1.getsuit() == "black":   ## change to card_1 == Card("black", "wild", CARD_SCALE) or card_1 == Card("black", "skip", CARD_SCALE)
+            if card_1.get_color() == "black":   ## change to card_1 == Card("black", "wild", CARD_SCALE) or card_1 == Card("black", "skip", CARD_SCALE)
                 n += 1
             else:
                 break
@@ -72,7 +71,7 @@ class Player:
         for card in self.pile:
             if card.get_value() == "wild":
                 self.amount -= 1
-            elif card.get_value() == card_1.get_value():   ### need to add if card != value it's false, return to hand
+            elif card.get_value() == card_1.get_value():
                     res.append(card)
             else:
                 bad.append(card)
@@ -89,11 +88,11 @@ class Player:
         """ checks to see if all cards in pile has same color. returns bool.  """
         self.amount = amount
         self.pile = pile
-        # get first card color, other than wild
+        # get first card color, other than wild or skip
         while True:
             n = 0
             card_1 = self.pile[n]
-            if card_1.getsuit() == "black":
+            if card_1.get_color() == "black":
                 n += 1
             else:
                 break
@@ -101,11 +100,11 @@ class Player:
         res = []
         bad = []
         for card in self.pile:
-            if card == Card("black", "wild", CARD_SCALE):
-                self.amount -= 1
+            # if card == Card("black", "wild", CARD_SCALE):
+            #     self.amount -= 1
             if card.get_value() == "wild":
                 self.amount -= 1
-            elif card.get_suit() == card_1.get_suit():   ### need to add if card != suit it's false, return to hand
+            elif card.get_color() == card_1.get_color():
                     res.append(card)
             else:
                 bad.append(card)
@@ -117,7 +116,7 @@ class Player:
             # self.complete = False
             return False
 
-    def check_run(self, amount, pile)
+    def check_run(self, amount, pile):
         self.amount = amount
         self.pile = pile
         # create an empty result list for acceptable cards and bad list for invalid cards        
@@ -127,17 +126,17 @@ class Player:
             if len(res) > 0:
                 start_card = res[0]
                 prev_card = res[-1]
-                if card.getvalue() == "skip":
+                if card.get_value() == "skip":
                     bad.append(card)
-                elif prev_card.getvalue() == "wild": #and len(res) == 1:
+                elif prev_card.get_value() == "wild": #and len(res) == 1:
                     res.append(card)
                 ### change below to -- elif: card.getvalue().isdigit() --- change else: to return False/put cards back (because of skip)
-                elif card.getvalue() == "wild" or int(card.getvalue()) == (int(prev_card.getvalue()) + 1):
+                elif card.get_value() == "wild" or int(card.get_value()) == (int(prev_card.get_value()) + 1):
                         res.append(card)
                 else:
                     bad.append(card)
             else:
-                if card.getvalue() == "skip":
+                if card.get_value() == "skip":
                     bad.append(card)
                 else:
                     res.append(card)
@@ -147,19 +146,9 @@ class Player:
         else:
             return False
 
-    def check_phase_complete(self, phase, pile_mat_list):
-        self.phase = phase
-        self.pile_mat_list = pile_mat_list
-        if self.phase in PHASE_1_MATS:
-            phase_pile = self.pile_mat_list[PHASE_PILE_1]
-        elif self.phase in PHASE_2_MATS:
-            phase_pile_b = self.pile_mat_list[PHASE_PILE_1]
-            phase_pile = self.pile_mat_list[PHASE_PILE_2]
-
+    def check_phase_complete(self):
         if self.phase == 1:
-            if self.check_set(3, phase_pile_b) and self.check_set(3, phase_pile):
-                # self.phase_complete = True
-                # self.phase += 1  -- maybe put at round end? if check_phase_complete = True, self.phase += 1
+            if self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile):
                 # hit_on_set = True  -- phase_pile_b.hit_on_set() phase_pile.hit_on_set()
                 return True
             else:
@@ -167,55 +156,59 @@ class Player:
                 return False
 
         elif self.phase == 2:
-            if (self.check_set(3, phase_pile) and self.check_run(4, phase_pile_b)) or (self.check_set(3, phase_pile_b) and self.check_run(4, phase_pile)):
+            if (self.check_set(3, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
+                or (self.check_set(3, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 3:
-            if (self.check_set(4, phase_pile) and self.check_run(4, phase_pile_b)) or (self.check_set(4, phase_pile_b) and self.check_run(4, phase_pile)):
+            if (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
+                or (self.check_set(4, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 4:
-            if self.check_run(7, phase_pile):
+            if self.check_run(7, self.phase_pile):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 5:
-            if self.check_run(8, phase_pile):
+            if self.check_run(8, self.phase_pile):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 6:
-            if self.check_run(9, phase_pile):
+            if self.check_run(9, self.phase_pile):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 7:
-            if self.check_set(4, phase_pile_b) and self.check_set(4, phase_pile):
+            if self.check_set(4, self.phase_pile_b) and self.check_set(4, self.phase_pile):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 8:
-            if self.check_color(7, phase_pile):
+            if self.check_color(7, self.phase_pile):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 9:
-            if (self.check_set(5, phase_pile) and self.check_set(2, phase_pile_b)) or (self.check_set(5, phase_pile_b) and self.check_set(2, phase_pile)):
+            if (self.check_set(5, self.phase_pile) and self.check_set(2, self.phase_pile_b))\
+                or (self.check_set(5, self.phase_pile_b) and self.check_set(2, self.phase_pile)):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
 
         elif self.phase == 10:
-            if (self.check_set(5, phase_pile) and self.check_set(3, phase_pile_b)) or (self.check_set(5, phase_pile_b) and self.check_set(3, phase_pile)):
+            if (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
+                or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile)):
                 self.phase_complete = True
             else:
                 self.phase_complete = False
@@ -244,3 +237,6 @@ class Comp(Player):
         super().__init__(name, turn, phase, phase_complete, score)
 
     ##add func to figure out phase piles
+
+if __name__ == "__main__":
+    pass
