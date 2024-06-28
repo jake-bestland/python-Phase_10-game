@@ -137,10 +137,12 @@ class Card(arcade.Sprite):
         """ Is this card face down? """
         return not self.is_face_up
 
+# create players
 user = Player("user", True)
 lcomp = Player("lcomp")
 mcomp = Player("mcomp")
 rcomp = Player("rcomp")
+
 class MyGame(arcade.Window):
     """ Main application class. """
 
@@ -164,41 +166,6 @@ class MyGame(arcade.Window):
 
         # Create a list of lists, each holds a pile of cards.
         self.piles = None
-
-        # Create players.
-        # user = Player("user", True)
-        # lcomp = Player("lcomp")
-        # mcomp = Player("mcomp")
-        # rcomp = Player("rcomp")
-
-        # self.phase_list = None
-
-        # # Keep track of phase
-        # self.phase = phase
-        # self.user_phase = 1
-        # self.lcomp_phase = 4
-        # self.mcomp_phase = 1
-        # self.rcomp_phase = 4
-
-        # # Keep track of score
-        # self.score = score
-        # self.user_score = 0
-        # self.lcomp_score = 0
-        # self.mcomp_score = 0
-        # self.rcomp_score = 0
-
-        # # Keep track of turn
-        # self.user_turn = True
-        # self.lcomp_turn = False
-        # self.mcomp_turn = False
-        # self.rcomp_turn = False
-
-        # # Check if phase has been completed
-        # self.user_phase_complete = False
-        # self.lcomp_phase_complete = False
-        # self.mcomp_phase_complete = False
-        # self.r_comp_phase_complete = False
-
 
     # def add_score(self, player):
     #     """at end of round, add the point total for each card remaining in hand to total score."""
@@ -288,10 +255,10 @@ class MyGame(arcade.Window):
 
         # assign phase piles to players
         user.determine_phase_piles(self.pile_mat_list)
-        lcomp.determine_phase_piles(self.pile_mat_list)
-        mcomp.determine_phase_piles(self.pile_mat_list)
-        rcomp.determine_phase_piles(self.pile_mat_list)
-        
+        lcomp.determine_phase_piles(self.pile_mat_list, user.last_pile)
+        mcomp.determine_phase_piles(self.pile_mat_list, lcomp.last_pile)
+        rcomp.determine_phase_piles(self.pile_mat_list, mcomp.last_pile)
+
         # --- Create, shuffle, and deal the cards
 
         # Sprite list with all the cards, no matter what pile they are in.
@@ -347,7 +314,6 @@ class MyGame(arcade.Window):
                 # Move cards to proper position
                 card.position = USER_HAND_X - (CARD_HORIZONTAL_OFFSET * 9) / 2, BOTTOM_Y
             # Sort cards in pile
-            # self.pull_to_top(card)
             self.sort_pile(USER_HAND_PILE)
             
         # loop to deal to each COMP hand pile
@@ -372,7 +338,6 @@ class MyGame(arcade.Window):
                     card.position = self.pile_mat_list[pile_no].center_x - (CARD_HORIZONTAL_OFFSET * 9) / 2, \
                                             self.pile_mat_list[pile_no].center_y
                 # Sort cards in pile
-                # self.pull_to_top(card)
                 self.sort_pile(pile_no)
                 
 
@@ -380,7 +345,7 @@ class MyGame(arcade.Window):
         card = self.piles[DECK_FACE_DOWN_PILE].pop()
         card.face_up()
         self.piles[DECK_FACE_UP_PILE].append(card)
-        card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position   
+        card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position
 
     def on_draw(self):
         """ Render the screen. """
@@ -424,15 +389,15 @@ class MyGame(arcade.Window):
                 card = self.piles[DECK_FACE_DOWN_PILE][-1]
                 # Flip face up
                 card.face_up()
-                # Move card position to discard/face-up pile
-                card.position = self.pile_mat_list[USER_HAND_PILE].position
+                # Move card position to user hand pile
+                card.position = self.pile_mat_list[USER_HAND_PILE].position  ## maybe different position? and use pull_to_top instead of sort
                 # Remove card from face down pile
                 self.piles[DECK_FACE_DOWN_PILE].remove(card)
                 # Move card to face up list
                 self.piles[USER_HAND_PILE].append(card)
                 # Put on top draw-order wise
                 # self.pull_to_top(card)
-                self.sort_pile(USER_HAND_PILE)
+                self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
 
             else:
                 # All other cases, grab the face-up card we are clicking on
@@ -830,6 +795,9 @@ class MyGame(arcade.Window):
                 self.pull_to_top(self.held_cards[-1])
                 for card in self.held_cards:
                     self.move_card_to_new_pile(card, pile_index)
+
+                if user.phase_complete():
+                    user.phase += 1
                 
                 reset_position = False
                 # add change to turn flag
