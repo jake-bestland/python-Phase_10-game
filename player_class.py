@@ -13,6 +13,7 @@ class Player:
         self.phase_pile = None
         self.phase_pile_b = None
         self.last_pile = None
+        self.draw_card = True
         # self.last_lcomp_pile = []
         # self.last_mcomp_pile = []
 

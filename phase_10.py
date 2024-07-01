@@ -363,6 +363,7 @@ class MyGame(arcade.Window):
         # Get list of cards we've clicked on
         cards = arcade.get_sprites_at_point((x, y), self.card_list)
 
+        # if user.turn = True:
         # Have we clicked on a card?
         if len(cards) > 0:
 
@@ -370,9 +371,8 @@ class MyGame(arcade.Window):
             pile_index = self.get_pile_for_card(cards[-1])
 
             # Are we clicking on the main deck?
-            draw_card = 1
             if pile_index == DECK_FACE_DOWN_PILE:
-                if draw_card > 0:
+                if user.draw_card:
                     # Get top card
                     card = self.piles[DECK_FACE_DOWN_PILE][-1]
                     # Flip face up
@@ -386,6 +386,10 @@ class MyGame(arcade.Window):
                     # Put on top draw-order wise
                     # self.pull_to_top(card)
                     self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
+                    user.draw_card = False
+                    
+                    # --- draw_card -= 1  ### and when end of round completed to add 1 back to draw_card --- #
+                
                 else:
                     pass
 
@@ -419,7 +423,7 @@ class MyGame(arcade.Window):
                     self.piles[DECK_FACE_UP_PILE].append(card)
                     card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position                    
 
-            # --- add buttons here? ---
+            # --- add buttons to click on here? ---
     
     def sort_pile(self, pile):
         """sorts cards in pile by value from low to high"""
@@ -503,6 +507,8 @@ class MyGame(arcade.Window):
 
             # Is it on a hand pile?
             elif USER_HAND_PILE <= pile_index <= RCOMP_HAND_PILE:
+                if self.get_pile_for_card(self.held_cards[0]) == DECK_FACE_UP_PILE:
+                    user.draw_card = False
                 # Are there already cards there?
                 if len(self.piles[pile_index]) > 0:
                     # Move cards to proper position
@@ -572,16 +578,21 @@ class MyGame(arcade.Window):
                 for card in self.held_cards:
                     self.move_card_to_new_pile(card, pile_index)
 
-                if user.phase_complete():
-                    user.phase += 1  ### change when to increase phase number. maybe complete flag
-                    print(f"user phase is now: {user.phase}")
+                if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
+                    if user.phase_complete():
+                        user.phase += 1  ### change when to increase phase number. maybe complete flag
+                        print(f"user phase is now: {user.phase}")
+                    else:
+                        for card in user.phase_pile[:]:
+                            self.move_card_to_new_pile(card, USER_HAND_PILE)
+                        for card in user.phase_pile_b[:]:
+                            self.move_card_to_new_pile(card, USER_HAND_PILE)
                 else:
-                    for card in user.phase_pile[:]:
-                        self.move_card_to_new_pile(card, USER_HAND_PILE)
-                    for card in user.phase_pile_b[:]:
-                        self.move_card_to_new_pile(card, USER_HAND_PILE)
-                
+                    pass
                 reset_position = False
+                #user.turn = False
+                user.draw_card = True
+                
                 # add change to turn flag
             
 
