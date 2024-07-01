@@ -254,10 +254,10 @@ class MyGame(arcade.Window):
         self.create_phase_mats(RCOMP_PHASE_X, rcomp.phase)
 
         # assign phase piles to players
-        user.determine_phase_piles(self.pile_mat_list)
-        lcomp.determine_phase_piles(self.pile_mat_list, user.last_pile)
-        mcomp.determine_phase_piles(self.pile_mat_list, lcomp.last_pile)
-        rcomp.determine_phase_piles(self.pile_mat_list, mcomp.last_pile)
+        # user.determine_phase_piles(self.pile_mat_list)
+        # lcomp.determine_phase_piles(self.pile_mat_list, user.last_pile)
+        # mcomp.determine_phase_piles(self.pile_mat_list, lcomp.last_pile)
+        # rcomp.determine_phase_piles(self.pile_mat_list, mcomp.last_pile)
 
         # --- Create, shuffle, and deal the cards
 
@@ -346,6 +346,12 @@ class MyGame(arcade.Window):
         card.face_up()
         self.piles[DECK_FACE_UP_PILE].append(card)
         card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position
+
+        # assign phase piles to players
+        user.determine_phase_piles(self.piles)
+        lcomp.determine_phase_piles(self.piles, user.last_pile)
+        mcomp.determine_phase_piles(self.piles, lcomp.last_pile)
+        rcomp.determine_phase_piles(self.piles, mcomp.last_pile)
 
     def on_draw(self):
         """ Render the screen. """
