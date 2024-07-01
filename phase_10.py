@@ -803,11 +803,12 @@ class MyGame(arcade.Window):
                     self.move_card_to_new_pile(card, pile_index)
 
                 if user.phase_complete():
-                    user.phase += 1
+                    user.phase += 1  ### change when to increase phase number. maybe complete flag
+                    print(f"user phase is now: {user.phase}")
                 else:
-                    for card in user.phase_pile:
+                    for card in user.phase_pile[:]:
                         self.move_card_to_new_pile(card, USER_HAND_PILE)
-                    for card in user.phase_pile_b:
+                    for card in user.phase_pile_b[:]:
                         self.move_card_to_new_pile(card, USER_HAND_PILE)
                 
                 reset_position = False
