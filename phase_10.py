@@ -804,6 +804,11 @@ class MyGame(arcade.Window):
 
                 if user.phase_complete():
                     user.phase += 1
+                else:
+                    for card in user.phase_pile:
+                        self.move_card_to_new_pile(card, USER_HAND_PILE)
+                    for card in user.phase_pile_b:
+                        self.move_card_to_new_pile(card, USER_HAND_PILE)
                 
                 reset_position = False
                 # add change to turn flag
