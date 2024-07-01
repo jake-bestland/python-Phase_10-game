@@ -16,42 +16,42 @@ class Player:
         # self.last_lcomp_pile = []
         # self.last_mcomp_pile = []
 
-    def determine_phase_piles(self, pile_mat_list, last_pile=5):
-        self.pile_mat_list = pile_mat_list
+    def determine_phase_piles(self, pile_list, last_pile=5):
+        self.pile_list = pile_list
         self.last_pile = last_pile
         if self.name == "user":
             if self.phase in PHASE_1_MATS:
-                self.phase_pile = self.pile_mat_list[PHASE_PILE_1]
+                self.phase_pile = self.pile_list[PHASE_PILE_1]
                 self.last_pile = PHASE_PILE_1
             elif self.phase in PHASE_2_MATS:
-                self.phase_pile = self.pile_mat_list[PHASE_PILE_1]
-                self.phase_pile_b = self.pile_mat_list[PHASE_PILE_2]
+                self.phase_pile = self.pile_list[PHASE_PILE_1]
+                self.phase_pile_b = self.pile_list[PHASE_PILE_2]
                 self.last_pile = PHASE_PILE_2
 
         elif self.name == "lcomp":
             if self.phase in PHASE_1_MATS:
-                self.phase_pile = self.pile_mat_list[self.last_pile + 1]
+                self.phase_pile = self.pile_list[self.last_pile + 1]
                 self.last_pile = self.last_pile + 1
             elif self.phase in PHASE_2_MATS:
-                self.phase_pile = self.pile_mat_list[self.last_pile + 1]
-                self.phase_pile_b = self.pile_mat_list[self.last_pile + 2]
+                self.phase_pile = self.pile_list[self.last_pile + 1]
+                self.phase_pile_b = self.pile_list[self.last_pile + 2]
                 self.last_pile = self.last_pile + 2
 
         elif self.name == "mcomp":
             if self.phase in PHASE_1_MATS:
-                self.phase_pile = self.pile_mat_list[self.last_pile + 1]
+                self.phase_pile = self.pile_list[self.last_pile + 1]
                 self.last_pile = self.last_pile + 1
             elif self.phase in PHASE_2_MATS:
-                self.phase_pile = self.pile_mat_list[self.last_pile + 1]
-                self.phase_pile_b = self.pile_mat_list[self.last_pile + 2] 
+                self.phase_pile = self.pile_list[self.last_pile + 1]
+                self.phase_pile_b = self.pile_list[self.last_pile + 2] 
                 self.last_pile = self.last_pile + 2
 
         elif self.name == "rcomp":
             if self.phase in PHASE_1_MATS:
-                self.phase_pile = self.pile_mat_list[self.last_pile + 1]
+                self.phase_pile = self.pile_list[self.last_pile + 1]
             elif self.phase in PHASE_2_MATS:
-                self.phase_pile = self.pile_mat_list[self.last_pile + 1]
-                self.phase_pile_b = self.pile_mat_list[self.last_pile + 2]    
+                self.phase_pile = self.pile_list[self.last_pile + 1]
+                self.phase_pile_b = self.pile_list[self.last_pile + 2]    
 
     def check_set(self, amount, pile):
         """check to see if cards in phase pile meets the phase requirement for a set.
