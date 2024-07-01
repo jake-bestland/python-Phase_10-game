@@ -1,6 +1,6 @@
 import arcade
 from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2, CARD_SCALE, CARD_VALUES
-# from phase_10 import Card
+
 
 # card_class = Card()
 
@@ -61,23 +61,25 @@ class Player:
         self.amount = amount
         self.pile = pile
         # get first card value other than wild or skip
-        while True:
-            n = 0
-            card_1 = self.pile[n]
-            if card_1.get_color() == "black":   ## change to card_1 == Card("black", "wild", CARD_SCALE) or card_1 == Card("black", "skip", CARD_SCALE)
-                n += 1
-            else:
-                break
+        # while True:
+        #     n = 0
+        #     card_1 = self.pile[n]
+        #     if card_1.get_color() == 4:   ## change to card_1 == Card("black", "wild", CARD_SCALE) or card_1 == Card("black", "skip", CARD_SCALE)
+        #         n += 1
+        #     else:
+        #         break
         # create an empty result list for acceptable cards and bad list for invalid cards
         res = []
         bad = []
+        card_1 = self.pile[0]
         for card in self.pile:
-            if card.get_value() == "wild":
-                self.amount -= 1
-            elif card.get_value() == card_1.get_value() or card.get_value() == "wild":
-                    res.append(card)
+            if card.get_value() == card_1.get_value():
+                res.append(card)
+            elif card.get_value() == "12":
+                res.append(card)
             else:
                 bad.append(card)
+            
         return len(res) >= self.amount and len(bad) == 0
         # if len(res) >= self.amount and len(bad) == 0:  # take out of for loop?
         #     # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)  ### maybe return player_phase_complete = True, and remove complete parameter
@@ -92,23 +94,22 @@ class Player:
         self.amount = amount
         self.pile = pile
         # get first card color, other than wild or skip
-        while True:
-            n = 0
-            card_1 = self.pile[n]
-            if card_1.get_color() == "black":
-                n += 1
-            else:
-                break
+        # while True:
+        #     n = 0
+        #     card_1 = self.pile[n]
+        #     if card_1.get_color() == "4":
+        #         n += 1
+        #     else:
+        #         break
         # create an empty result list for acceptable cards and bad list for invalid cards
         res = []
         bad = []
+        card_1 = self.pile[0]
         for card in self.pile:
-            # if card == Card("black", "wild", CARD_SCALE):
-            #     self.amount -= 1
-            if card.get_value() == "wild":
-                self.amount -= 1
-            elif card.get_color() == card_1.get_color() or card.get_value() == "wild":
-                    res.append(card)
+            if card.get_value() == "12":
+                res.append(card)
+            if card.get_color() == card_1.get_color():
+                res.append(card)
             else:
                 bad.append(card)
         return len(res) >= self.amount and len(bad) == 0
@@ -130,17 +131,17 @@ class Player:
             if len(res) > 0:
                 start_card = res[0]
                 prev_card = res[-1]
-                if card.get_value() == "skip":
+                if card.get_value() == "13": # "skip"
                     bad.append(card)
-                elif prev_card.get_value() == "wild": #and len(res) == 1:
+                elif prev_card.get_value() == "12": #and len(res) == 1: # wild_card
                     res.append(card)
                 ### change below to -- elif: card.getvalue().isdigit() --- change else: to return False/put cards back (because of skip)
-                elif card.get_value() == "wild" or int(card.get_value()) == (int(prev_card.get_value()) + 1):
+                elif card.get_value() == "12" or int(card.get_value()) == (int(prev_card.get_value()) + 1):
                         res.append(card)
                 else:
                     bad.append(card)
             else:
-                if card.get_value() == "skip":
+                if card.get_value() == "13": #skip card
                     bad.append(card)
                 else:
                     res.append(card)
@@ -152,22 +153,11 @@ class Player:
 
     def phase_complete(self):
         if self.phase == 1:
-            return self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile)
-            # if self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile):
-            #     # hit_on_set = True  -- phase_pile_b.hit_on_set() phase_pile.hit_on_set()
-            #     return True
-            # else:
-            #     # self.phase_complete = False
-            #     return False
+            return (self.check_set(3, self.phase_pile_b) and self.check_set(3, self.phase_pile))
 
         elif self.phase == 2:
             return (self.check_set(3, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
                 or (self.check_set(3, self.phase_pile_b) and self.check_run(4, self.phase_pile))
-            # if (self.check_set(3, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
-            #     or (self.check_set(3, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 3:
             return (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
