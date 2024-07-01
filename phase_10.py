@@ -167,19 +167,6 @@ class MyGame(arcade.Window):
         # Create a list of lists, each holds a pile of cards.
         self.piles = None
 
-    # def add_score(self, player):
-    #     """at end of round, add the point total for each card remaining in hand to total score."""
-    #     self.player = player
-    #     for card in player.hand:
-    #         if card in CARD_VALUES[:9]:
-    #             player.score += 5
-    #         elif card in CARD_VALUES[10:12]:
-    #             player.score += 10
-    #         elif card == CARD_VALUES[13]:
-    #             player.score += 15
-    #         else:
-    #             player.score += 25    
-
     def create_phase_mats(self, pile_x, phase):
         """ creates the play/phase piles for each player = user, lcomp, mcomp, or rcomp
         either one or two piles based on which phase they are on """
@@ -252,12 +239,6 @@ class MyGame(arcade.Window):
         self.create_phase_mats(LCOMP_PHASE_X, lcomp.phase)
         self.create_phase_mats(MCOMP_PHASE_X, mcomp.phase)
         self.create_phase_mats(RCOMP_PHASE_X, rcomp.phase)
-
-        # assign phase piles to players
-        # user.determine_phase_piles(self.pile_mat_list)
-        # lcomp.determine_phase_piles(self.pile_mat_list, user.last_pile)
-        # mcomp.determine_phase_piles(self.pile_mat_list, lcomp.last_pile)
-        # rcomp.determine_phase_piles(self.pile_mat_list, mcomp.last_pile)
 
         # --- Create, shuffle, and deal the cards
 
@@ -339,7 +320,6 @@ class MyGame(arcade.Window):
                                             self.pile_mat_list[pile_no].center_y
                 # Sort cards in pile
                 self.sort_pile(pile_no)
-                
 
         # Flip over top card from main deck to face-up/ discard pile
         card = self.piles[DECK_FACE_DOWN_PILE].pop()
@@ -390,20 +370,24 @@ class MyGame(arcade.Window):
             pile_index = self.get_pile_for_card(cards[-1])
 
             # Are we clicking on the main deck?
+            draw_card = 1
             if pile_index == DECK_FACE_DOWN_PILE:
-                # Get top card
-                card = self.piles[DECK_FACE_DOWN_PILE][-1]
-                # Flip face up
-                card.face_up()
-                # Move card position to user hand pile
-                card.position = self.pile_mat_list[USER_HAND_PILE].position  ## maybe different position? and use pull_to_top instead of sort
-                # Remove card from face down pile
-                self.piles[DECK_FACE_DOWN_PILE].remove(card)
-                # Move card to face up list
-                self.piles[USER_HAND_PILE].append(card)
-                # Put on top draw-order wise
-                # self.pull_to_top(card)
-                self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
+                if draw_card > 0:
+                    # Get top card
+                    card = self.piles[DECK_FACE_DOWN_PILE][-1]
+                    # Flip face up
+                    card.face_up()
+                    # Move card position to user hand pile
+                    card.position = self.pile_mat_list[USER_HAND_PILE].position  ## maybe different position? and use pull_to_top instead of sort
+                    # Remove card from face down pile
+                    self.piles[DECK_FACE_DOWN_PILE].remove(card)
+                    # Move card to user hand list
+                    self.piles[USER_HAND_PILE].append(card)
+                    # Put on top draw-order wise
+                    # self.pull_to_top(card)
+                    self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
+                else:
+                    pass
 
             else:
                 # All other cases, grab the face-up card we are clicking on
@@ -493,220 +477,6 @@ class MyGame(arcade.Window):
         self.piles[pile_index].append(card)
         if pile_index != DECK_FACE_UP_PILE:
             self.sort_pile(pile_index)
-
-    ### this will be more for future AI code to check phase piles for each comp
-    def determine_phase_piles(self):  ## don't need as new func, just add code to setup?
-        if self.user_phase in PHASE_1_MATS:  ## - play pile func?
-            self.user_phase_pile = self.pile_mat_list[PHASE_PILE_1]
-            last_user_pile = PHASE_PILE_1
-        elif self.user_phase in PHASE_2_MATS:
-            self.user_phase_pile_b = self.pile_mat_list[PHASE_PILE_1]
-            self.user_phase_pile = self.pile_mat_list[PHASE_PILE_2]
-            last_user_pile = PHASE_PILE_2
-
-        if self.lcomp_phase in PHASE_1_MATS:
-            self.lcomp_phase_pile = self.pile_mat_list[last_user_pile + 1]
-            last_lcomp_pile = last_user_pile + 1
-        elif self.lcomp_phase in PHASE_2_MATS:
-            self.lcomp_phase_pile_b = self.pile_mat_list[last_user_pile + 1]
-            self.lcomp_phase_pile = self.pile_mat_list[last_user_pile + 2]
-            last_lcomp_pile = last_user_pile + 2
-
-        if self.mcomp_phase in PHASE_1_MATS:
-            self.mcomp_phase_pile = self.pile_mat_list[last_lcomp_pile + 1]
-            last_mcomp_pile = last_lcomp_pile + 1
-        elif self.mcomp_phase in PHASE_2_MATS:
-            self.mcomp_phase_pile_b = self.pile_mat_list[last_lcomp_pile + 1]
-            self.mcomp_phase_pile = self.pile_mat_list[last_lcomp_pile + 2] 
-            last_mcomp_pile = last_lcomp_pile + 2
-
-        if self.rcomp_phase in PHASE_1_MATS:
-            self.rcomp_phase_pile = self.pile_mat_list[last_mcomp_pile + 1]
-        elif self.rcomp_phase in PHASE_2_MATS:
-            self.rcomp_phase_pile_b = self.pile_mat_list[last_mcomp_pile + 1]
-            self.rcomp_phase_pile = self.pile_mat_list[last_mcomp_pile + 2]
-
-
-    def check_set(self, amount, pile):#, complete=False):  # elim complete?
-        """check to see if cards in phase pile meets the phase requirement for a set.
-        amount = number of cards with same value needed to complete phase
-        pile = the list of cards in the phase pile being checked
-        returns bool"""
-        self.amount = amount
-        self.pile = pile
-        # self.complete = complete # elim complete?
-        # get first card value other than wild or skip
-        while True:
-            n = 0
-            card_1 = self.pile[n]
-            if card_1.getsuit() == "black":
-                n += 1
-            else:
-                break
-        # create an empty result list for acceptable cards and bad list for invalid cards
-        res = []
-        bad = []
-        for card in self.pile:
-            if card.get_value() == "wild":
-                self.amount -= 1
-            elif card.get_value() == card_1.get_value():   ### need to add if card != value it's false, return to hand
-                    res.append(card)
-            else:
-                bad.append(card)
-        return len(res) >= self.amount and len(bad) == 0
-        # if len(res) >= self.amount and len(bad) == 0:  # take out of for loop?
-        #     # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)  ### maybe return player_phase_complete = True, and remove complete parameter
-        #     # hit_on_set = True  --for future 'hitting' func
-        #     return True
-        # else:
-        #     # self.complete = False
-        #     return False
-
-        ### if phase == 1:
-        ### if check_set(3, phase pile 1) and check_set(3, phase pile 2):
-                ###phase 1 = True. or self.user_phase_complete = True, self.user_phase +1
-
-        ### if check_set(3, phase pile 1, True) and check_set(3, phase pile 2, True):
-                ###phase 1 = True. or self.user_phase_complete = True, self.user_phase +1
-    
-    def check_color(self, amount, pile):#, complete=False):
-        """ checks to see if all cards in pile has same color. returns bool.  """
-        self.amount = amount
-        self.pile = pile
-        # self.complete = complete
-        # get first card color, other than wild
-        while True:
-            n = 0
-            card_1 = self.pile[n]
-            if card_1.getsuit() == "black":
-                n += 1
-                continue
-            else:
-                break
-        # create an empty result list for acceptable cards and bad list for invalid cards
-        res = []
-        bad = []
-        for card in self.pile:
-            # if card == Card("black", "wild", CARD_SCALE):
-            #     self.amount -= 1
-            if card.get_value() == "wild":
-                self.amount -= 1
-            elif card.get_suit() == card_1.get_suit():   ### need to add if card != suit it's false, return to hand
-                    res.append(card)
-            else:
-                bad.append(card)
-        if len(res) >= self.amount and len(bad) == 0:
-            # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)
-            # hit_on_color = True  --for future 'hitting' func
-            return True
-        else:
-            # self.complete = False
-            return False
-
-    def check_run(self, amount, pile):#, complete=False):
-        self.amount = amount
-        self.pile = pile
-        # self.complete = complete
-        # create an empty result list for acceptable cards and bad list for invalid cards        
-        res = []
-        bad = []
-        for card in self.pile:  ### need to change value of wild card when adding into run.
-            if len(res) > 0:
-                start_card = res[0]
-                prev_card = res[-1]
-                if card.getvalue() == "skip":
-                    bad.append(card)
-                elif prev_card.getvalue() == "wild": #and len(res) == 1:
-                    res.append(card)
-                ### change below to -- elif: card.getvalue().isdigit() --- change else: to return False/put cards back (because of skip)
-                elif card.getvalue() == "wild" or int(card.getvalue()) == (int(prev_card.getvalue()) + 1):
-                        res.append(card)
-                else:
-                    bad.append(card)
-            else:
-                if card.getvalue() == "skip":
-                    bad.append(card)
-                else:
-                    res.append(card)
-        if len(res) >= self.amount and len(bad) == 0:
-            # hit_on_run = True  --for future 'hitting' func
-            return True
-        else:
-            return False
-
-    def check_phase_complete(self, phase): # for user  # ex: check_phase_complete(self.user_phase)
-        self.phase = phase
-        if self.phase in PHASE_1_MATS:
-            phase_pile = self.pile_mat_list[PHASE_PILE_1]
-        elif self.phase in PHASE_2_MATS:
-            phase_pile_b = self.pile_mat_list[PHASE_PILE_1]
-            phase_pile = self.pile_mat_list[PHASE_PILE_2]
-
-        if self.phase == 1:
-            if self.check_set(3, phase_pile_b) and self.check_set(3, phase_pile):
-                # self.phase_complete = True
-                # self.phase += 1  -- maybe put at round end? if check_phase_complete = True, self.phase += 1
-                # hit_on_set = True  -- phase_pile_b.hit_on_set() phase_pile.hit_on_set()
-                return True
-            else:
-                # self.phase_complete = False
-                return False
-
-        elif self.phase == 2:
-            if (self.check_set(3, phase_pile) and self.check_run(4, phase_pile_b)) or (self.check_set(3, phase_pile_b) and self.check_run(4, phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 3:
-            if (self.check_set(4, phase_pile) and self.check_run(4, phase_pile_b)) or (self.check_set(4, phase_pile_b) and self.check_run(4, phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 4:
-            if self.check_run(7, phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 5:
-            if self.check_run(8, phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 6:
-            if self.check_run(9, phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 7:
-            if self.check_set(4, phase_pile_b) and self.check_set(4, phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 8:
-            if self.check_color(7, phase_pile):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 9:
-            if (self.check_set(5, phase_pile) and self.check_set(2, phase_pile_b)) or (self.check_set(5, phase_pile_b) and self.check_set(2, phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-        elif self.phase == 10:
-            if (self.check_set(5, phase_pile) and self.check_set(3, phase_pile_b)) or (self.check_set(5, phase_pile_b) and self.check_set(3, phase_pile)):
-                self.phase_complete = True
-            else:
-                self.phase_complete = False
-
-
     
     def on_mouse_release(self, x: float, y: float, button: int,
                          modifiers: int):
@@ -823,9 +593,6 @@ class MyGame(arcade.Window):
 
         # We are no longer holding cards
         self.held_cards = []
-
-    
-    
     
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         """ User moves mouse """
@@ -835,7 +602,6 @@ class MyGame(arcade.Window):
             card.center_x += dx
             card.center_y += dy
             
-
 
 def main():
     """ Main function """
