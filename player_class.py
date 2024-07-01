@@ -74,7 +74,7 @@ class Player:
         for card in self.pile:
             if card.get_value() == "wild":
                 self.amount -= 1
-            elif card.get_value() == card_1.get_value():
+            elif card.get_value() == card_1.get_value() or card.get_value() == "wild":
                     res.append(card)
             else:
                 bad.append(card)
@@ -107,7 +107,7 @@ class Player:
             #     self.amount -= 1
             if card.get_value() == "wild":
                 self.amount -= 1
-            elif card.get_color() == card_1.get_color():
+            elif card.get_color() == card_1.get_color() or card.get_value() == "wild":
                     res.append(card)
             else:
                 bad.append(card)
