@@ -1,11 +1,10 @@
 import arcade
-from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2, CARD_SCALE, CARD_VALUES
+from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2, CARD_HORIZONTAL_OFFSET
 
 
-# card_class = Card()
-
+# add hand param. then in phase complete method, if false return cards to hand?
 class Player:
-    def __init__(self, name, turn=False, phase=1, score=0):
+    def __init__(self, name, turn=False, phase=1, score=0):  
         self.name = name
         self.turn = turn
         self.phase = phase
@@ -14,8 +13,7 @@ class Player:
         self.phase_pile_b = None
         self.last_pile = None
         self.draw_card = True
-        # self.last_lcomp_pile = []
-        # self.last_mcomp_pile = []
+        self.complete = False
 
     def determine_phase_piles(self, pile_list, last_pile=5):
         self.pile_list = pile_list
@@ -126,27 +124,61 @@ class Player:
         self.amount = amount
         self.pile = pile
         # create an empty result list for acceptable cards and bad list for invalid cards        
-        res = []
         bad = []
-        for card in self.pile:  ### need to change value of wild card when adding into run.
-            if len(res) > 0:
-                start_card = res[0]
-                prev_card = res[-1]
-                if card.get_value() == "13": # "skip"
+        wild = []
+        run = []
+        ### maybe instead of reversing to pull wild cards. just run a loop on self.pile and take out wild cards and end?
+        reverse_hand = []
+        while len(self.pile) != 0:
+            reverse_hand.append(self.pile.pop())
+        for card in reverse_hand:
+            if card.get_value() == "13":
+                bad.append(card)
+            elif card.get_value() == "12":
+                wild.append(card)
+            else:
+                run.insert(0, card)
+
+        for card in run:
+            if len(self.pile) > 0:
+                prev_card = self.pile[-1]
+                if int(card.get_value()) == (int(prev_card.get_value()) + 1):
+                    self.pile.append(card)
+                elif int(card.get_value()) == int(prev_card.get_value()):
                     bad.append(card)
-                elif prev_card.get_value() == "12": #and len(res) == 1: # wild_card
-                    res.append(card)
-                ### change below to -- elif: card.getvalue().isdigit() --- change else: to return False/put cards back (because of skip)
-                elif card.get_value() == "12" or int(card.get_value()) == (int(prev_card.get_value()) + 1):
-                        res.append(card)
+                elif len(wild) >= (int(card.get_value()) - int(prev_card.get_value())) - 1:
+                    for i in range((int(card.get_value()) - int(prev_card.get_value())) - 1):
+                        new_card = wild.pop()
+                        new_card.change_value(int(prev_card.get_value()) + 1)
+                        self.pile.append(new_card)
+                        ## use sort_pile method ?
+                        new_card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
+                                                prev_card.center_y
+                        prev_card = new_card
+                    self.pile.append(card)
+                    card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
+                                            prev_card.center_y
                 else:
                     bad.append(card)
             else:
-                if card.get_value() == "13": #skip card
-                    bad.append(card)
-                else:
-                    res.append(card)
-        if len(res) >= self.amount and len(bad) == 0:
+                self.pile.append(card)
+
+        while len(wild) > 0:
+            prev_card = self.pile[-1]
+            new_card = wild.pop()
+            if int(prev_card.get_value()) < 11:
+                new_card.change_value(int(prev_card.get_value()) + 1)
+                self.pile.append(new_card)
+                continue
+            else:
+                start_card = self.pile[0]
+                new_card.change_value(int(start_card.get_value()) - 1)
+                print(new_card.get_value())
+                self.pile.insert(0, new_card)
+                continue
+
+        # self.sort_pile(self.pile)
+        if len(self.pile) >= self.amount and len(bad) == 0:
             # hit_on_run = True  --for future 'hitting' func
             return True
         else:
@@ -222,20 +254,24 @@ class Player:
             # else:
             #     self.phase_complete = False
 
-    def add_score(self, player):
+    def add_score(self, hand):
         """at end of round, add the point total for each card remaining in hand to total score."""
-        self.player = player
-        for card in player.hand:
-            if card in CARD_VALUES[:9]:
-                player.score += 5
-            elif card in CARD_VALUES[10:12]:
-                player.score += 10
-            elif card == CARD_VALUES[13]:
-                player.score += 15
-            else:
-                player.score += 25  
+        self.hand = hand
+        if len(self.hand) > 0:
+            for card in self.hand:
+                if card.get_value() in range(0, 8):
+                    self.score += 5
+                elif card.get_value() in range(9,11):
+                    self.score += 10
+                elif card.get_value() == "13":
+                    self.score += 15
+                else:
+                    self.score += 25
+        else:
+            pass
+        print(self.score)
 
-class User(Player):
+class User(Player):  # may not need
     def __init__(self, name, turn, phase=1, phase_complete=False, score=0):
         super().__init__(name, turn, phase, phase_complete, score)
 
@@ -245,7 +281,7 @@ class Comp(Player):
     def __init__(self, name, turn, phase=1, phase_complete=False, score=0):
         super().__init__(name, turn, phase, phase_complete, score)
 
-    ##add func to figure out phase piles
+    ##add methods for what to do on comp turn.
 
 # if __name__ == "__main__":
 #     pass
