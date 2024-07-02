@@ -122,6 +122,11 @@ class Card(arcade.Sprite):
         """returns the color of card"""
         return self.suit
 
+    def change_value(self, new_value):
+        """changes the value of the Card"""
+        self.new_value = new_value
+        self.value = self.new_value
+
     def face_down(self):
         """ Turn card face-down """
         self.texture = arcade.load_texture(FACE_DOWN_IMAGE)
@@ -138,7 +143,7 @@ class Card(arcade.Sprite):
         return not self.is_face_up
 
 # create players
-user = Player("user", True)
+user = Player("user", True, 2)
 lcomp = Player("lcomp")
 mcomp = Player("mcomp")
 rcomp = Player("rcomp")
@@ -344,6 +349,8 @@ class MyGame(arcade.Window):
         # Draw the cards
         self.card_list.draw()
 
+        # add all players score and phase
+
     def pull_to_top(self, card: arcade.Sprite):
         """ Pull card to top of rendering order (last to render, looks on-top) """
 
@@ -356,6 +363,8 @@ class MyGame(arcade.Window):
         if symbol == arcade.key.R:
             # Restart
             self.setup()
+
+        ## add key to diplay scoreboard, rules or phase requirements?
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """ Called when the user presses a mouse button. """
@@ -532,8 +541,11 @@ class MyGame(arcade.Window):
                 reset_position = False
 
             # Release on phase pile?
+            ### need to remove ability to drop on comp phase piles unless their phase is complete/ len == 0
+            ### lcomp.phase_pile and lcomp.phase_pile_b .. etc.
+
             elif PHASE_PILE_1 <= pile_index <= PHASE_PILE_8:
-                if len(self.piles[pile_index]) > 0:
+                if len(self.piles[pile_index]) > 0: # add hitting method/check for comp phases? or if user.complete = True
                     # Move cards to proper position
                     top_card = self.piles[pile_index][-1]
                     for dropped_card in self.held_cards:
@@ -580,13 +592,20 @@ class MyGame(arcade.Window):
 
                 if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
                     if user.phase_complete():
-                        user.phase += 1  ### change when to increase phase number. maybe complete flag
+                        user.complete = True
+                        # user.phase += 1  ### change when to increase phase number. maybe complete flag
                         print(f"user phase is now: {user.phase}")
+                        # self.sort_pile(self.piles[user.phase_pile])
+                        # self.sort_pile(self.piles[user.phase_pile_b])
                     else:
-                        for card in user.phase_pile[:]:
-                            self.move_card_to_new_pile(card, USER_HAND_PILE)
-                        for card in user.phase_pile_b[:]:
-                            self.move_card_to_new_pile(card, USER_HAND_PILE)
+                        if user.phase in PHASE_1_MATS:
+                            for card in user.phase_pile:
+                                self.move_card_to_new_pile(card, USER_HAND_PILE)
+                        elif user.phase in PHASE_2_MATS:
+                            for card in user.phase_pile:
+                                self.move_card_to_new_pile(card, USER_HAND_PILE)   
+                            for card in user.phase_pile_b:
+                                self.move_card_to_new_pile(card, USER_HAND_PILE)
                 else:
                     pass
                 reset_position = False
@@ -612,7 +631,15 @@ class MyGame(arcade.Window):
         for card in self.held_cards:
             card.center_x += dx
             card.center_y += dy
-            
+    
+    def round_over(self):
+        for pile_no in range(USER_HAND_PILE, RCOMP_HAND_PILE + 1):
+            if len(self.piles[pile_no]) == 0:
+                # add window to say round over, display scores / player rounds
+                self.setup()
+
+## add class scoreboard(arcade.view)?
+
 
 def main():
     """ Main function """
