@@ -80,13 +80,13 @@ MCOMP_HAND_PILE = 4
 RCOMP_HAND_PILE = 5
 PHASE_PILE_1 = 6
 PHASE_PILE_2 = 7
-## might not need rest
+## might not need 3 - 7
 # PHASE_PILE_3 = 8
 # PHASE_PILE_4 = 9
 # PHASE_PILE_5 = 10
 # PHASE_PILE_6 = 11
 # PHASE_PILE_7 = 12
-# PHASE_PILE_8 = 13
+PHASE_PILE_8 = 13
 
 # List of phases that require 1 or 2 mat piles
 PHASE_1_MATS = [4, 5, 6, 8]
@@ -396,8 +396,6 @@ class MyGame(arcade.Window):
                     # self.pull_to_top(card)
                     self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
                     user.draw_card = False
-                    
-                    # --- draw_card -= 1  ### and when end of round completed to add 1 back to draw_card --- #
                 
                 else:
                     pass
@@ -502,6 +500,7 @@ class MyGame(arcade.Window):
         # Find the closest pile, in case we are in contact with more than one
         pile, distance = arcade.get_closest_sprite(self.held_cards[0], self.pile_mat_list)
         reset_position = True
+        draw_pile = False
 
         # See if we are in contact with the closest pile
         if arcade.check_for_collision(self.held_cards[0], pile):
@@ -514,10 +513,14 @@ class MyGame(arcade.Window):
                 # If so, who cares. We'll just reset our position.
                 pass
 
-            # Is it on a hand pile?
+            # Is it on a hand pile?   ### change to just user hand pile (or if comp hand, reset position) for finished game ###
             elif USER_HAND_PILE <= pile_index <= RCOMP_HAND_PILE:
                 if self.get_pile_for_card(self.held_cards[0]) == DECK_FACE_UP_PILE:
-                    user.draw_card = False
+                    # need to fix this ##
+                    if user.draw_card == False:
+                        draw_pile = True
+                    else:
+                        user.draw_card = False
                 # Are there already cards there?
                 if len(self.piles[pile_index]) > 0:
                     # Move cards to proper position
@@ -538,7 +541,7 @@ class MyGame(arcade.Window):
                     self.move_card_to_new_pile(card, pile_index)
                 
                 # Success, don't reset position of cards
-                reset_position = False
+                reset_position = draw_pile
 
             # Release on phase pile?
             ### need to remove ability to drop on COMP phase piles unless their phase is complete/ len == 0
@@ -595,7 +598,7 @@ class MyGame(arcade.Window):
                     if user.phase_complete():
                         user.complete = True
                         # user.phase += 1  ### change when to increase phase number. maybe complete flag
-                        print(f"user phase is now: {user.phase}")
+                        #print(f"user phase is now: {user.phase}")
                         self.sort_pile(PHASE_PILE_1)
                         self.sort_pile(PHASE_PILE_2)
                     else:
