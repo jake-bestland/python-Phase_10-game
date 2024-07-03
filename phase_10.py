@@ -594,24 +594,50 @@ class MyGame(arcade.Window):
                 for card in self.held_cards:
                     self.move_card_to_new_pile(card, pile_index)
 
-                if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
-                    if user.phase_complete():
-                        user.complete = True
-                        # user.phase += 1  ### change when to increase phase number. maybe complete flag
-                        #print(f"user phase is now: {user.phase}")
-                        self.sort_pile(PHASE_PILE_1)
-                        self.sort_pile(PHASE_PILE_2)
-                    else:
-                        if user.phase in PHASE_1_MATS:
+                if user.phase in PHASE_1_MATS:
+                    if len(user.phase_pile) > 0:
+                        if user.phase_complete():
+                            user.complete = True
+                            self.sort_pile(PHASE_PILE_1)
+                        else:
                             for card in self.piles[PHASE_PILE_1][:]:
                                 self.move_card_to_new_pile(card, USER_HAND_PILE)
                             self.sort_pile(USER_HAND_PILE)
-                        elif user.phase in PHASE_2_MATS:
+                    else:
+                        pass
+                elif user.phase in PHASE_2_MATS:
+                    if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
+                        if user.phase_complete():
+                            user.complete = True
+                            self.sort_pile(PHASE_PILE_1)
+                            self.sort_pile(PHASE_PILE_2)
+                        else:
                             for card in self.piles[PHASE_PILE_1][:]:
-                                self.move_card_to_new_pile(card, USER_HAND_PILE)   
+                                self.move_card_to_new_pile(card, USER_HAND_PILE)
                             for card in self.piles[PHASE_PILE_2][:]:
                                 self.move_card_to_new_pile(card, USER_HAND_PILE)
                             self.sort_pile(USER_HAND_PILE)
+                    else:
+                        pass
+                
+                # if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
+                #     if user.phase_complete():
+                #         user.complete = True
+                #         # user.phase += 1  ### change when to increase phase number. maybe complete flag
+                #         #print(f"user phase is now: {user.phase}")
+                #         self.sort_pile(PHASE_PILE_1)
+                #         self.sort_pile(PHASE_PILE_2)
+                #     else:
+                #         if user.phase in PHASE_1_MATS:
+                #             for card in self.piles[PHASE_PILE_1][:]:
+                #                 self.move_card_to_new_pile(card, USER_HAND_PILE)
+                #             self.sort_pile(USER_HAND_PILE)
+                #         elif user.phase in PHASE_2_MATS:
+                #             for card in self.piles[PHASE_PILE_1][:]:
+                #                 self.move_card_to_new_pile(card, USER_HAND_PILE)   
+                #             for card in self.piles[PHASE_PILE_2][:]:
+                #                 self.move_card_to_new_pile(card, USER_HAND_PILE)
+                #             self.sort_pile(USER_HAND_PILE)
                 else:
                     pass
                 reset_position = False
