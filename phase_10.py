@@ -595,17 +595,19 @@ class MyGame(arcade.Window):
                         user.complete = True
                         # user.phase += 1  ### change when to increase phase number. maybe complete flag
                         print(f"user phase is now: {user.phase}")
-                        # self.sort_pile(self.piles[user.phase_pile])
-                        # self.sort_pile(self.piles[user.phase_pile_b])
+                        self.sort_pile(PHASE_PILE_1)
+                        self.sort_pile(PHASE_PILE_2)
                     else:
                         if user.phase in PHASE_1_MATS:
-                            for card in user.phase_pile:
+                            for card in self.piles[PHASE_PILE_1][:]:
                                 self.move_card_to_new_pile(card, USER_HAND_PILE)
+                            self.sort_pile(USER_HAND_PILE)
                         elif user.phase in PHASE_2_MATS:
-                            for card in user.phase_pile:
+                            for card in self.piles[PHASE_PILE_1][:]:
                                 self.move_card_to_new_pile(card, USER_HAND_PILE)   
-                            for card in user.phase_pile_b:
+                            for card in self.piles[PHASE_PILE_2][:]:
                                 self.move_card_to_new_pile(card, USER_HAND_PILE)
+                            self.sort_pile(USER_HAND_PILE)
                 else:
                     pass
                 reset_position = False
@@ -635,8 +637,18 @@ class MyGame(arcade.Window):
     def round_over(self):
         for pile_no in range(USER_HAND_PILE, RCOMP_HAND_PILE + 1):
             if len(self.piles[pile_no]) == 0:
+                if user.complete:
+                    user.phase += 1
+                if lcomp.complete:
+                    lcomp.phase += 1
+                if mcomp.complete:
+                    mcomp.phase += 1
+                if rcomp.complete:
+                    rcomp.phase += 1
                 # add window to say round over, display scores / player rounds
                 self.setup()
+            else:
+                pass
 
 ## add class scoreboard(arcade.view)?
 
