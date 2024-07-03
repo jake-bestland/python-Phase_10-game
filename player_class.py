@@ -123,66 +123,132 @@ class Player:
     def check_run(self, amount, pile):
         self.amount = amount
         self.pile = pile
-        # create an empty result list for acceptable cards and bad list for invalid cards        
+        # create an empty result list for acceptable cards and bad list for invalid cards
+        res = []
         bad = []
+        # list to put wild cards in
         wild = []
-        run = []
-        ### maybe instead of reversing to pull wild cards. just run a loop on self.pile and take out wild cards and end?
-        reverse_hand = []
-        while len(self.pile) != 0:
-            reverse_hand.append(self.pile.pop())
-        for card in reverse_hand:
+        # list of the numbered cards (non-wild/skip cards)
+        num = []
+        
+        # sort cards into appropriate list
+        # skip cards to bad list, wild cards into wild list, and numbered cards into num list
+        for card in self.pile:
             if card.get_value() == "13":
                 bad.append(card)
             elif card.get_value() == "12":
                 wild.append(card)
             else:
-                run.insert(0, card)
+                num.append(card)
 
-        for card in run:
-            if len(self.pile) > 0:
-                prev_card = self.pile[-1]
+        # itereate over numbered cards and start forming run of cards
+        for card in num:
+            if len(res) > 0:
+                # check if the second card is one number higher than first
+                prev_card = res[-1]
                 if int(card.get_value()) == (int(prev_card.get_value()) + 1):
-                    self.pile.append(card)
+                    res.append(card)
+                # check if cards are the same number, which is not valid for a run
                 elif int(card.get_value()) == int(prev_card.get_value()):
                     bad.append(card)
+                # if the next card does not come next in the run, check is a wild card(s) can be used as next card in run.
                 elif len(wild) >= (int(card.get_value()) - int(prev_card.get_value())) - 1:
+                    # loop for number of wild cards that are being used iin between numbered cards.
                     for i in range((int(card.get_value()) - int(prev_card.get_value())) - 1):
                         new_card = wild.pop()
+                        # change value of the wild card to the number it is being used as in the run.
                         new_card.change_value(int(prev_card.get_value()) + 1)
-                        self.pile.append(new_card)
-                        ## use sort_pile method ?
-                        new_card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
-                                                prev_card.center_y
+                        res.append(new_card)
+                        # set prev_card to the wild card
                         prev_card = new_card
-                    self.pile.append(card)
-                    card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
-                                            prev_card.center_y
+                    res.append(card)
                 else:
                     bad.append(card)
+            # add first card to list
             else:
-                self.pile.append(card)
+                res.append(card)
 
+        # add remaining wild cards to end of the run
         while len(wild) > 0:
-            prev_card = self.pile[-1]
+            prev_card = res[-1]
             new_card = wild.pop()
+            # check if last card is 12, or the highest card
             if int(prev_card.get_value()) < 11:
                 new_card.change_value(int(prev_card.get_value()) + 1)
-                self.pile.append(new_card)
-                continue
+                res.append(new_card)
+            # if last card is 12, add wild to the beginning of the run
             else:
-                start_card = self.pile[0]
+                start_card = res[0]
                 new_card.change_value(int(start_card.get_value()) - 1)
                 print(new_card.get_value())
-                self.pile.insert(0, new_card)
-                continue
+                res.insert(0, new_card)
 
-        # self.sort_pile(self.pile)
-        if len(self.pile) >= self.amount and len(bad) == 0:
+        # check if there are enough valid cards to complete the run and no invalid cards
+        if len(res) >= self.amount and len(bad) == 0:
             # hit_on_run = True  --for future 'hitting' func
             return True
         else:
+            #change value of wild cards back to original
+            for card in self.pile:
+                if card.image_file_name == "./images/black_cards/black13.png":
+                    card.change_value("13")
             return False
+
+        # reverse_hand = []
+        # while len(self.pile) != 0:
+        #     reverse_hand.append(self.pile.pop())
+        # for card in reverse_hand:
+        #     if card.get_value() == "13":
+        #         bad.append(card)
+        #     elif card.get_value() == "12":
+        #         wild.append(card)
+        #     else:
+        #         num.insert(0, card)
+
+        # for card in num:
+        #     if len(self.pile) > 0:
+        #         prev_card = self.pile[-1]
+        #         if int(card.get_value()) == (int(prev_card.get_value()) + 1):
+        #             self.pile.append(card)
+        #         elif int(card.get_value()) == int(prev_card.get_value()):
+        #             bad.append(card)
+        #         elif len(wild) >= (int(card.get_value()) - int(prev_card.get_value())) - 1:
+        #             for i in range((int(card.get_value()) - int(prev_card.get_value())) - 1):
+        #                 new_card = wild.pop()
+        #                 new_card.change_value(int(prev_card.get_value()) + 1)
+        #                 self.pile.append(new_card)
+        #                 ## use sort_pile method ?
+        #                 new_card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
+        #                                         prev_card.center_y
+        #                 prev_card = new_card
+        #             self.pile.append(card)
+        #             card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
+        #                                     prev_card.center_y
+        #         else:
+        #             bad.append(card)
+        #     else:
+        #         self.pile.append(card)
+
+        # while len(wild) > 0:
+        #     prev_card = self.pile[-1]
+        #     new_card = wild.pop()
+        #     if int(prev_card.get_value()) < 11:
+        #         new_card.change_value(int(prev_card.get_value()) + 1)
+        #         self.pile.append(new_card)
+        #         continue
+        #     else:
+        #         start_card = self.pile[0]
+        #         new_card.change_value(int(start_card.get_value()) - 1)
+        #         print(new_card.get_value())
+        #         self.pile.insert(0, new_card)
+        #         continue
+
+        # self.sort_pile(self.pile)
+        # if len(self.pile) >= self.amount and len(bad) == 0:
+        #     # hit_on_run = True  --for future 'hitting' func
+        #     return True
+        # else:
+        #     return False
 
     def phase_complete(self):
         if self.phase == 1:
