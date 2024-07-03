@@ -59,17 +59,10 @@ class Player:
         returns bool"""
         self.amount = amount
         self.pile = pile
-        # get first card value other than wild or skip
-        # while True:
-        #     n = 0
-        #     card_1 = self.pile[n]
-        #     if card_1.get_color() == 4:   ## change to card_1 == Card("black", "wild", CARD_SCALE) or card_1 == Card("black", "skip", CARD_SCALE)
-        #         n += 1
-        #     else:
-        #         break
         # create an empty result list for acceptable cards and bad list for invalid cards
         res = []
         bad = []
+        # assign first card in pile to variable to check value against
         card_1 = self.pile[0]
         for card in self.pile:
             if card.get_value() == card_1.get_value():
@@ -80,29 +73,15 @@ class Player:
                 bad.append(card)
             
         return len(res) >= self.amount and len(bad) == 0
-        # if len(res) >= self.amount and len(bad) == 0:  # take out of for loop?
-        #     # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)  ### maybe return player_phase_complete = True, and remove complete parameter
-        #     # hit_on_set = True  --for future 'hitting' func
-        #     return True
-        # else:
-        #     # self.complete = False
-        #     return False
 
     def check_color(self, amount, pile):
         """ checks to see if all cards in pile has same color. returns bool.  """
         self.amount = amount
         self.pile = pile
-        # get first card color, other than wild or skip
-        # while True:
-        #     n = 0
-        #     card_1 = self.pile[n]
-        #     if card_1.get_color() == "4":
-        #         n += 1
-        #     else:
-        #         break
         # create an empty result list for acceptable cards and bad list for invalid cards
         res = []
         bad = []
+        # assign first card in pile to variable to check color against
         card_1 = self.pile[0]
         for card in self.pile:
             if card.get_value() == "12":
@@ -111,14 +90,8 @@ class Player:
                 res.append(card)
             else:
                 bad.append(card)
+
         return len(res) >= self.amount and len(bad) == 0
-        # if len(res) >= self.amount and len(bad) == 0:
-        #     # self.complete = True   ### maybe change to a phase check = True (from a phase check func?)
-        #     # hit_on_color = True  --for future 'hitting' func
-        #     return True
-        # else:
-        #     # self.complete = False
-        #     return False
 
     def check_run(self, amount, pile):
         self.amount = amount
@@ -130,7 +103,6 @@ class Player:
         wild = []
         # list of the numbered cards (non-wild/skip cards)
         num = []
-        
         # sort cards into appropriate list
         # skip cards to bad list, wild cards into wild list, and numbered cards into num list
         for card in self.pile:
@@ -193,62 +165,6 @@ class Player:
                 if card.image_file_name == "./images/black_cards/black13.png":
                     card.change_value("13")
             return False
-
-        # reverse_hand = []
-        # while len(self.pile) != 0:
-        #     reverse_hand.append(self.pile.pop())
-        # for card in reverse_hand:
-        #     if card.get_value() == "13":
-        #         bad.append(card)
-        #     elif card.get_value() == "12":
-        #         wild.append(card)
-        #     else:
-        #         num.insert(0, card)
-
-        # for card in num:
-        #     if len(self.pile) > 0:
-        #         prev_card = self.pile[-1]
-        #         if int(card.get_value()) == (int(prev_card.get_value()) + 1):
-        #             self.pile.append(card)
-        #         elif int(card.get_value()) == int(prev_card.get_value()):
-        #             bad.append(card)
-        #         elif len(wild) >= (int(card.get_value()) - int(prev_card.get_value())) - 1:
-        #             for i in range((int(card.get_value()) - int(prev_card.get_value())) - 1):
-        #                 new_card = wild.pop()
-        #                 new_card.change_value(int(prev_card.get_value()) + 1)
-        #                 self.pile.append(new_card)
-        #                 ## use sort_pile method ?
-        #                 new_card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
-        #                                         prev_card.center_y
-        #                 prev_card = new_card
-        #             self.pile.append(card)
-        #             card.position = prev_card.center_x + CARD_HORIZONTAL_OFFSET, \
-        #                                     prev_card.center_y
-        #         else:
-        #             bad.append(card)
-        #     else:
-        #         self.pile.append(card)
-
-        # while len(wild) > 0:
-        #     prev_card = self.pile[-1]
-        #     new_card = wild.pop()
-        #     if int(prev_card.get_value()) < 11:
-        #         new_card.change_value(int(prev_card.get_value()) + 1)
-        #         self.pile.append(new_card)
-        #         continue
-        #     else:
-        #         start_card = self.pile[0]
-        #         new_card.change_value(int(start_card.get_value()) - 1)
-        #         print(new_card.get_value())
-        #         self.pile.insert(0, new_card)
-        #         continue
-
-        # self.sort_pile(self.pile)
-        # if len(self.pile) >= self.amount and len(bad) == 0:
-        #     # hit_on_run = True  --for future 'hitting' func
-        #     return True
-        # else:
-        #     return False
 
     def phase_complete(self):
         if self.phase == 1:
@@ -325,9 +241,9 @@ class Player:
         self.hand = hand
         if len(self.hand) > 0:
             for card in self.hand:
-                if card.get_value() in range(0, 8):
+                if int(card.get_value()) in range(0, 9):
                     self.score += 5
-                elif card.get_value() in range(9,11):
+                elif int(card.get_value()) in range(9, 12):
                     self.score += 10
                 elif card.get_value() == "13":
                     self.score += 15
