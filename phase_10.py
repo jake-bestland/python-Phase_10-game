@@ -81,12 +81,12 @@ RCOMP_HAND_PILE = 5
 PHASE_PILE_1 = 6
 PHASE_PILE_2 = 7
 ## might not need rest
-PHASE_PILE_3 = 8
-PHASE_PILE_4 = 9
-PHASE_PILE_5 = 10
-PHASE_PILE_6 = 11
-PHASE_PILE_7 = 12
-PHASE_PILE_8 = 13
+# PHASE_PILE_3 = 8
+# PHASE_PILE_4 = 9
+# PHASE_PILE_5 = 10
+# PHASE_PILE_6 = 11
+# PHASE_PILE_7 = 12
+# PHASE_PILE_8 = 13
 
 # List of phases that require 1 or 2 mat piles
 PHASE_1_MATS = [4, 5, 6, 8]
@@ -143,7 +143,7 @@ class Card(arcade.Sprite):
         return not self.is_face_up
 
 # create players
-user = Player("user", True, 2)
+user = Player("user", 4, True)
 lcomp = Player("lcomp")
 mcomp = Player("mcomp")
 rcomp = Player("rcomp")
@@ -541,8 +541,10 @@ class MyGame(arcade.Window):
                 reset_position = False
 
             # Release on phase pile?
-            ### need to remove ability to drop on comp phase piles unless their phase is complete/ len == 0
+            ### need to remove ability to drop on COMP phase piles unless their phase is complete/ len == 0
             ### lcomp.phase_pile and lcomp.phase_pile_b .. etc.
+            ### if phase complete, card needs to be vaild part of set/run/color
+            ### maybe seperate user phase piles from comp phase piles?
 
             elif PHASE_PILE_1 <= pile_index <= PHASE_PILE_8:
                 if len(self.piles[pile_index]) > 0: # add hitting method/check for comp phases? or if user.complete = True
@@ -572,7 +574,6 @@ class MyGame(arcade.Window):
                 for card in self.held_cards:
                     self.move_card_to_new_pile(card, pile_index)
 
-                
                 reset_position = False
 
             # Release on discard pile
@@ -615,7 +616,6 @@ class MyGame(arcade.Window):
                 user.draw_card = True
                 
                 # add change to turn flag
-            
 
         if reset_position:
             # Where-ever we were dropped, it wasn't valid. Reset the each card's position

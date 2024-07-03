@@ -4,10 +4,10 @@ from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_P
 
 # add hand param. then in phase complete method, if false return cards to hand?
 class Player:
-    def __init__(self, name, turn=False, phase=1, score=0):  
+    def __init__(self, name, phase=1, turn=False, score=0):  
         self.name = name
-        self.turn = turn
         self.phase = phase
+        self.turn = turn
         self.score = score
         self.phase_pile = None
         self.phase_pile_b = None
