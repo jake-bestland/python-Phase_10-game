@@ -96,12 +96,13 @@ PHASE_2_MATS = [1, 2, 3, 7, 9, 10]
 class Card(arcade.Sprite):
     """ Card sprite """
 
-    def __init__(self, suit=0, value=0, scale=1):
+    def __init__(self, suit=0, value=0, scale=1, points=0):
         """ Card constructor """
 
         # Attributes for suit and value
         self.suit = suit
         self.value = value
+        self.points = points
 
         # Image to use for the sprite when face up
         self.image_file_name = f"./images/{CARD_SUITS[self.suit]}_cards/{CARD_SUITS[self.suit]}{(self.value + 1):0>2}.png"
@@ -127,6 +128,16 @@ class Card(arcade.Sprite):
         self.new_value = new_value
         self.value = self.new_value
 
+    def get_points(self):
+        if self.value in range(0, 9):
+            self.points = 5
+        elif self.value in range(9, 12):
+            self.points = 10
+        elif self.value == 13:
+            self.points = 15
+        else:
+            self.points += 25
+
     def face_down(self):
         """ Turn card face-down """
         self.texture = arcade.load_texture(FACE_DOWN_IMAGE)
@@ -143,7 +154,7 @@ class Card(arcade.Sprite):
         return not self.is_face_up
 
 # create players
-user = Player("user", 4, True)
+user = Player("user", 1, True)
 lcomp = Player("lcomp")
 mcomp = Player("mcomp")
 rcomp = Player("rcomp")
@@ -281,6 +292,7 @@ class MyGame(arcade.Window):
             self.piles[DECK_FACE_DOWN_PILE].append(card)
 
         # - Pull from that pile into the user and comp hand piles, comp hands face-down, user hand face-up
+
         # deal to USER hand
         # Deal proper number of cards for that pile
         for j in range(10):
@@ -399,6 +411,13 @@ class MyGame(arcade.Window):
                 
                 else:
                     pass
+
+            if pile_index == DECK_FACE_UP_PILE:
+                if user.draw_card:
+                    card = self.piles[DECK_FACE_UP_PILE][-1]
+                    if card.get_value() != "13":
+                        self.held_cards = [card]
+                        self.held_cards_original_position = [self.held_cards[0].position]
 
             else:
                 # All other cases, grab the face-up card we are clicking on
