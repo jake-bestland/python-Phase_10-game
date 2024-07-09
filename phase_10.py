@@ -73,7 +73,7 @@ FACE_DOWN_IMAGE = "./images/card_back.png"
 # Constants that represent "what pile is what" for the game
 PILE_COUNT = 14
 DECK_FACE_DOWN_PILE = 0
-DECK_FACE_UP_PILE = 1
+DISCARD_PILE = 1
 USER_HAND_PILE = 2
 LCOMP_HAND_PILE = 3
 MCOMP_HAND_PILE = 4
@@ -158,6 +158,12 @@ user = Player("user", 1, True)
 lcomp = Player("lcomp")
 mcomp = Player("mcomp")
 rcomp = Player("rcomp")
+
+player_list = []
+player_list.append(user)
+player_list.append(lcomp)
+player_list.append(mcomp)
+player_list.append(rcomp)
 
 class MyGame(arcade.Window):
     """ Main application class. """
@@ -321,7 +327,7 @@ class MyGame(arcade.Window):
                 # Pop the card off the deck we are dealing from
                 card = self.piles[DECK_FACE_DOWN_PILE].pop()
                 #### --- Card face up for debugging purposes, # keep face down for game --- ###
-                card.face_up()
+                # card.face_up()
                 # Put in the proper pile
                 if len(self.piles[pile_no]) > 0:
                     # Move cards to proper position
@@ -341,8 +347,17 @@ class MyGame(arcade.Window):
         # Flip over top card from main deck to face-up/ discard pile
         card = self.piles[DECK_FACE_DOWN_PILE].pop()
         card.face_up()
-        self.piles[DECK_FACE_UP_PILE].append(card)
-        card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position
+        self.piles[DISCARD_PILE].append(card)
+        card.position = self.pile_mat_list[DISCARD_PILE].position
+        # if a skip card is flipped over, skip first player
+        if card.get_value() == "13":
+            user.skipped = True
+            user.turn = False
+            for card in self.piles[USER_HAND_PILE]:
+                card.face_down()
+            lcomp.turn = True
+            for card in self.piles[LCOMP_HAND_PILE]:
+                card.face_up()
 
         # assign phase piles to players
         user.determine_phase_piles(self.piles)
@@ -393,31 +408,49 @@ class MyGame(arcade.Window):
 
             # Are we clicking on the main deck?
             if pile_index == DECK_FACE_DOWN_PILE:
-                if user.draw_card:
-                    # Get top card
-                    card = self.piles[DECK_FACE_DOWN_PILE][-1]
-                    # Flip face up
-                    card.face_up()
-                    # Move card position to user hand pile
-                    card.position = self.pile_mat_list[USER_HAND_PILE].position  ## maybe different position? and use pull_to_top instead of sort
-                    # Remove card from face down pile
-                    self.piles[DECK_FACE_DOWN_PILE].remove(card)
-                    # Move card to user hand list
-                    self.piles[USER_HAND_PILE].append(card)
-                    # Put on top draw-order wise
-                    # self.pull_to_top(card)
-                    self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
-                    user.draw_card = False
-                
+                if user.turn and user.draw_card:
+                    user.draw_card_from_deck(self.piles, self.pile_mat_list, USER_HAND_PILE)
+                    self.sort_pile(USER_HAND_PILE)
+                    # # Get top card
+                    # card = self.piles[DECK_FACE_DOWN_PILE][-1]
+                    # # Flip face up
+                    # card.face_up()
+                    # # Move card position to user hand pile
+                    # card.position = self.pile_mat_list[USER_HAND_PILE].position  ## maybe different position? and use pull_to_top instead of sort
+                    # # Remove card from face down pile
+                    # self.piles[DECK_FACE_DOWN_PILE].remove(card)
+                    # # Move card to user hand list
+                    # self.piles[USER_HAND_PILE].append(card)
+                    # # Put on top draw-order wise
+                    # # self.pull_to_top(card)
+                    # self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
+                    # user.turn = False
+                elif lcomp.turn and lcomp.draw_card:
+                    lcomp.draw_card_from_deck(self.piles, self.pile_mat_list, LCOMP_HAND_PILE)
+                    self.sort_pile(LCOMP_HAND_PILE)
+
+                elif mcomp.turn and mcomp.draw_card:
+                    mcomp.draw_card_from_deck(self.piles, self.pile_mat_list, MCOMP_HAND_PILE)
+                    self.sort_pile(MCOMP_HAND_PILE)
+
+                elif rcomp.turn and rcomp.draw_card:
+                    rcomp.draw_card_from_deck(self.piles, self.pile_mat_list, RCOMP_HAND_PILE)
+                    self.sort_pile(RCOMP_HAND_PILE)
                 else:
                     pass
 
-            if pile_index == DECK_FACE_UP_PILE:
-                if user.draw_card:
-                    card = self.piles[DECK_FACE_UP_PILE][-1]
-                    if card.get_value() != "13":
-                        self.held_cards = [card]
-                        self.held_cards_original_position = [self.held_cards[0].position]
+            #### need to fix clicking on skip card / unable to pick up skip from discard pile
+            # if pile_index == DECK_FACE_UP_PILE:
+            #     if user.draw_card:
+            #         card = self.piles[DECK_FACE_UP_PILE][-1]
+            #         if card.get_value() != "13":
+            #             self.held_cards = [card]
+            #             self.held_cards_original_position = [self.held_cards[0].position]
+            #         else:
+            #             pass
+            #     else:
+            #         pass
+
 
             else:
                 # All other cases, grab the face-up card we are clicking on
@@ -437,17 +470,17 @@ class MyGame(arcade.Window):
                 # Is it our turned over flip mat? and no cards on it?
                 if mat_index == DECK_FACE_DOWN_PILE and len(self.piles[DECK_FACE_DOWN_PILE]) == 0:
                     # Flip the deck back over so we can restart
-                    temp_list = self.piles[DECK_FACE_UP_PILE].copy()
+                    temp_list = self.piles[DISCARD_PILE].copy()
                     for card in reversed(temp_list):
                         card.face_down()
-                        self.piles[DECK_FACE_UP_PILE].remove(card)
+                        self.piles[DISCARD_PILE].remove(card)
                         self.piles[DECK_FACE_DOWN_PILE].append(card)
                         card.position = self.pile_mat_list[DECK_FACE_DOWN_PILE].position
                     # flip over top card
                     card = self.piles[DECK_FACE_DOWN_PILE].pop()
                     card.face_up()
-                    self.piles[DECK_FACE_UP_PILE].append(card)
-                    card.position = self.pile_mat_list[DECK_FACE_UP_PILE].position                    
+                    self.piles[DISCARD_PILE].append(card)
+                    card.position = self.pile_mat_list[DISCARD_PILE].position                    
 
             # --- add buttons to click on here? ---
     
@@ -488,7 +521,7 @@ class MyGame(arcade.Window):
     def remove_card_from_pile(self, card):
         """ Remove card from whatever pile it was in. """
         for pile in self.piles:
-            if card in pile and pile == self.piles[DECK_FACE_UP_PILE]:
+            if card in pile and pile == self.piles[DISCARD_PILE]:
                 pile.remove(card)
                 break
             elif card in pile:
@@ -505,7 +538,7 @@ class MyGame(arcade.Window):
         """ Move the card to a new pile """
         self.remove_card_from_pile(card)
         self.piles[pile_index].append(card)
-        if pile_index != DECK_FACE_UP_PILE:
+        if pile_index != DISCARD_PILE:
             self.sort_pile(pile_index)
     
     def on_mouse_release(self, x: float, y: float, button: int,
@@ -533,34 +566,138 @@ class MyGame(arcade.Window):
                 pass
 
             # Is it on a hand pile?   ### change to just user hand pile (or if comp hand, reset position) for finished game ###
-            elif USER_HAND_PILE <= pile_index <= RCOMP_HAND_PILE:
-                if self.get_pile_for_card(self.held_cards[0]) == DECK_FACE_UP_PILE:
-                    # need to fix this ##
-                    if user.draw_card == False:
-                        draw_pile = True
-                    else:
-                        user.draw_card = False
-                # Are there already cards there?
-                if len(self.piles[pile_index]) > 0:
-                    # Move cards to proper position
-                    top_card = self.piles[pile_index][-1]
-                    for dropped_card in self.held_cards:
-                        dropped_card.position = top_card.center_x + CARD_HORIZONTAL_OFFSET, \
-                                                top_card.center_y
-                else:
-                    # Are there no cards in the USER hand pile?
-                    for dropped_card in self.held_cards:
-                        # Move cards to proper position
-                        dropped_card.position = pile.center_x - (CARD_HORIZONTAL_OFFSET * 9) / 2, \
-                                                pile.center_y
-                # Sort pile by card value
-                self.sort_pile(pile_index)
-                for card in self.held_cards:
-                    # Cards are in the right position, but we need to move them to the right list
-                    self.move_card_to_new_pile(card, pile_index)
+            # elif USER_HAND_PILE <= pile_index <= RCOMP_HAND_PILE:
+            #     if self.get_pile_for_card(self.held_cards[0]) == DISCARD_PILE:
+            #         # need to fix this ##
+            #         if user.turn == False:
+            #             draw_pile = True
+            #         else:
+            #             user.turn = False
+            #     # Are there already cards there?
+            #     if len(self.piles[pile_index]) > 0:
+            #         # Move cards to proper position
+            #         top_card = self.piles[pile_index][-1]
+            #         for dropped_card in self.held_cards:
+            #             dropped_card.position = top_card.center_x + CARD_HORIZONTAL_OFFSET, \
+            #                                     top_card.center_y
+            #     else:
+            #         # Are there no cards in the USER hand pile?
+            #         for dropped_card in self.held_cards:
+            #             # Move cards to proper position
+            #             dropped_card.position = pile.center_x - (CARD_HORIZONTAL_OFFSET * 9) / 2, \
+            #                                     pile.center_y
+            #     # Sort pile by card value
+            #     self.sort_pile(pile_index)
+            #     for card in self.held_cards:
+            #         # Cards are in the right position, but we need to move them to the right list
+            #         self.move_card_to_new_pile(card, pile_index)
                 
-                # Success, don't reset position of cards
+            #     # Success, don't reset position of cards
+            #     reset_position = draw_pile
+
+            elif pile_index == USER_HAND_PILE:
+                if user.turn == False:
+                    for dropped_card in self.held_cards:
+                        if dropped_card.get_value() == "13":
+                            user.skipped = True
+                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                        else:
+                            draw_pile = True
+                else:
+                    if self.get_pile_for_card(self.held_cards[0]) == DISCARD_PILE:
+                        if user.draw_card == False:
+                            draw_pile = True
+                        else:
+                            for card in self.held_cards:
+                                self.move_card_to_new_pile(card, pile_index)
+                            user.draw_card = False
+                    
+                    elif self.get_pile_for_card(self.held_cards[0]) == user.phase_pile or self.get_pile_for_card(self.held_cards[0]) == user.phase_pile_b:
+                        for card in self.held_cards:
+                            self.move_card_to_new_pile(card, pile_index)
+                    else:
+                        draw_pile = True
+
                 reset_position = draw_pile
+
+            elif pile_index == LCOMP_HAND_PILE:
+                if lcomp.turn == False:
+                    for dropped_card in self.held_cards:
+                        if dropped_card.get_value() == "13":
+                            lcomp.skipped = True
+                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                        else:
+                            draw_pile = True
+                else:
+                    if self.get_pile_for_card(self.held_cards[0]) == DISCARD_PILE:
+                        if lcomp.draw_card == False:
+                            draw_pile = True
+                        else:
+                            for card in self.held_cards:
+                                self.move_card_to_new_pile(card, pile_index)
+                            lcomp.draw_card = False
+                    
+                    elif self.get_pile_for_card(self.held_cards[0]) == lcomp.phase_pile or self.get_pile_for_card(self.held_cards[0]) == lcomp.phase_pile_b:
+                        for card in self.held_cards:
+                            self.move_card_to_new_pile(card, pile_index)
+                    else:
+                        draw_pile = True
+
+                reset_position = draw_pile
+
+            elif pile_index == MCOMP_HAND_PILE:
+                if mcomp.turn == False:
+                    for dropped_card in self.held_cards:
+                        if dropped_card.get_value() == "13":
+                            mcomp.skipped = True
+                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                        else:
+                            draw_pile = True
+                else:
+                    if self.get_pile_for_card(self.held_cards[0]) == DISCARD_PILE:
+                        if mcomp.draw_card == False:
+                            draw_pile = True
+                        else:
+                            for card in self.held_cards:
+                                self.move_card_to_new_pile(card, pile_index)
+                            mcomp.draw_card = False
+                    
+                    elif self.get_pile_for_card(self.held_cards[0]) == mcomp.phase_pile or self.get_pile_for_card(self.held_cards[0]) == mcomp.phase_pile_b:
+                        for card in self.held_cards:
+                            self.move_card_to_new_pile(card, pile_index)
+                    else:
+                        draw_pile = True
+
+                reset_position = draw_pile
+                    
+            elif pile_index == RCOMP_HAND_PILE:
+                if rcomp.turn == False:
+                    for dropped_card in self.held_cards:
+                        if dropped_card.get_value() == "13":
+                            rcomp.skipped = True
+                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                        else:
+                            draw_pile = True
+                else:
+                    if self.get_pile_for_card(self.held_cards[0]) == DISCARD_PILE:
+                        if rcomp.draw_card == False:
+                            draw_pile = True
+                        else:
+                            for card in self.held_cards:
+                                self.move_card_to_new_pile(card, pile_index)
+                            rcomp.draw_card = False
+                    
+                    elif self.get_pile_for_card(self.held_cards[0]) == rcomp.phase_pile or self.get_pile_for_card(self.held_cards[0]) == rcomp.phase_pile_b:
+                        for card in self.held_cards:
+                            self.move_card_to_new_pile(card, pile_index)
+                    else:
+                        draw_pile = True
+
+                reset_position = draw_pile
+
+
+
+
 
             # Release on phase pile?
             ### need to remove ability to drop on COMP phase piles unless their phase is complete/ len == 0
@@ -599,7 +736,7 @@ class MyGame(arcade.Window):
                 reset_position = False
 
             # Release on discard pile
-            elif pile_index == DECK_FACE_UP_PILE:
+            elif pile_index == DISCARD_PILE:
                 if len(self.piles[pile_index]) > 0:
                     top_card = self.piles[pile_index][-1]
                     for dropped_card in self.held_cards:
@@ -613,55 +750,234 @@ class MyGame(arcade.Window):
                 for card in self.held_cards:
                     self.move_card_to_new_pile(card, pile_index)
 
-                if user.phase in PHASE_1_MATS:
-                    if len(user.phase_pile) > 0:
-                        if user.phase_complete():
-                            user.complete = True
-                            self.sort_pile(PHASE_PILE_1)
+                ### write method in Player class to simplify
+                if user.turn:
+                    if user.phase in PHASE_1_MATS:
+                        if len(user.phase_pile) > 0:
+                            if user.phase_complete():
+                                user.complete = True
+                                self.sort_pile(user.last_pile)
+                                user.turn = False
+                                for card in self.piles[USER_HAND_PILE]:
+                                    card.face_down()
+                                lcomp.turn = True
+                                lcomp.draw_card = True
+                                for card in self.piles[LCOMP_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[user.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, USER_HAND_PILE)
+                                self.sort_pile(USER_HAND_PILE)
                         else:
-                            for card in self.piles[PHASE_PILE_1][:]:
-                                self.move_card_to_new_pile(card, USER_HAND_PILE)
-                            self.sort_pile(USER_HAND_PILE)
-                    else:
-                        pass
-                elif user.phase in PHASE_2_MATS:
-                    if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
-                        if user.phase_complete():
-                            user.complete = True
-                            self.sort_pile(PHASE_PILE_1)
-                            self.sort_pile(PHASE_PILE_2)
+                            user.turn = False
+                            for card in self.piles[USER_HAND_PILE]:
+                                card.face_down()
+                            lcomp.turn = True
+                            lcomp.draw_card = True
+                            for card in self.piles[LCOMP_HAND_PILE]:
+                                card.face_up()
+
+                    elif user.phase in PHASE_2_MATS:
+                        if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
+                            if user.phase_complete():
+                                user.complete = True
+                                self.sort_pile(user.last_pile - 1)
+                                self.sort_pile(user.last_pile)
+                                # user.end_turn()
+                                user.turn = False
+                                for card in self.piles[USER_HAND_PILE]:
+                                    card.face_down()
+                                lcomp.turn = True
+                                lcomp.draw_card = True
+                                for card in self.piles[LCOMP_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[user.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, USER_HAND_PILE)
+                                for card in self.piles[user.phase_pile_b][:]:
+                                    self.move_card_to_new_pile(card, USER_HAND_PILE)
+                                self.sort_pile(USER_HAND_PILE)
                         else:
-                            for card in self.piles[PHASE_PILE_1][:]:
-                                self.move_card_to_new_pile(card, USER_HAND_PILE)
-                            for card in self.piles[PHASE_PILE_2][:]:
-                                self.move_card_to_new_pile(card, USER_HAND_PILE)
-                            self.sort_pile(USER_HAND_PILE)
-                    else:
-                        pass
+                            user.turn = False
+                            for card in self.piles[USER_HAND_PILE]:
+                                card.face_down()
+                            lcomp.turn = True
+                            lcomp.draw_card = True
+                            for card in self.piles[LCOMP_HAND_PILE]:
+                                card.face_up()
                 
-                # if len(user.phase_pile) > 0 or len(user.phase_pile_b) > 0:
-                #     if user.phase_complete():
-                #         user.complete = True
-                #         # user.phase += 1  ### change when to increase phase number. maybe complete flag
-                #         #print(f"user phase is now: {user.phase}")
-                #         self.sort_pile(PHASE_PILE_1)
-                #         self.sort_pile(PHASE_PILE_2)
-                #     else:
-                #         if user.phase in PHASE_1_MATS:
-                #             for card in self.piles[PHASE_PILE_1][:]:
-                #                 self.move_card_to_new_pile(card, USER_HAND_PILE)
-                #             self.sort_pile(USER_HAND_PILE)
-                #         elif user.phase in PHASE_2_MATS:
-                #             for card in self.piles[PHASE_PILE_1][:]:
-                #                 self.move_card_to_new_pile(card, USER_HAND_PILE)   
-                #             for card in self.piles[PHASE_PILE_2][:]:
-                #                 self.move_card_to_new_pile(card, USER_HAND_PILE)
-                #             self.sort_pile(USER_HAND_PILE)
+                
+                
+                elif lcomp.turn:
+                    if lcomp.phase in PHASE_1_MATS:
+                        if len(lcomp.phase_pile) > 0:
+                            if lcomp.phase_complete():
+                                lcomp.complete = True
+                                self.sort_pile(user.last_pile + 1)
+                                lcomp.turn = False
+                                for card in self.piles[LCOMP_HAND_PILE]:
+                                    card.face_down()
+                                mcomp.turn = True
+                                mcomp.draw_card = True
+                                for card in self.piles[MCOMP_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[lcomp.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, LCOMP_HAND_PILE)
+                                self.sort_pile(LCOMP_HAND_PILE)
+                        else:
+                            lcomp.turn = False
+                            for card in self.piles[LCOMP_HAND_PILE]:
+                                card.face_down()
+                            mcomp.turn = True
+                            mcomp.draw_card = True
+                            for card in self.piles[MCOMP_HAND_PILE]:
+                                card.face_up()
+                    
+                    elif lcomp.phase in PHASE_2_MATS:
+                        if len(lcomp.phase_pile) > 0 or len(lcomp.phase_pile_b) > 0:
+                            if lcomp.phase_complete():
+                                lcomp.complete = True
+                                self.sort_pile(user.last_pile + 1)
+                                self.sort_pile(user.last_pile + 2)
+                                lcomp.turn = False
+                                for card in self.piles[LCOMP_HAND_PILE]:
+                                    card.face_down()
+                                mcomp.turn = True
+                                mcomp.draw_card = True
+                                for card in self.piles[MCOMP_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[lcomp.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, LCOMP_HAND_PILE)
+                                for card in self.piles[lcomp.phase_pile_b][:]:
+                                    self.move_card_to_new_pile(card, LCOMP_HAND_PILE)
+                                self.sort_pile(LCOMP_HAND_PILE)
+                        else:
+                            lcomp.turn = False
+                            for card in self.piles[LCOMP_HAND_PILE]:
+                                card.face_down()
+                            mcomp.turn = True
+                            mcomp.draw_card = True
+                            for card in self.piles[MCOMP_HAND_PILE]:
+                                card.face_up()
+
+                
+                
+                elif mcomp.turn:
+                    if mcomp.phase in PHASE_1_MATS:
+                        if len(mcomp.phase_pile) > 0:
+                            if mcomp.phase_complete():
+                                mcomp.complete = True
+                                self.sort_pile(lcomp.last_pile + 1)
+                                mcomp.turn = False
+                                for card in self.piles[MCOMP_HAND_PILE]:
+                                    card.face_down()
+                                rcomp.turn = True
+                                rcomp.draw_card = True
+                                for card in self.piles[RCOMP_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[mcomp.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, MCOMP_HAND_PILE)
+                                self.sort_pile(MCOMP_HAND_PILE)
+                        else:
+                            mcomp.turn = False
+                            for card in self.piles[MCOMP_HAND_PILE]:
+                                card.face_down()
+                            rcomp.turn = True
+                            rcomp.draw_card = True
+                            for card in self.piles[RCOMP_HAND_PILE]:
+                                card.face_up()
+                    
+                    elif mcomp.phase in PHASE_2_MATS:
+                        if len(mcomp.phase_pile) > 0 or len(mcomp.phase_pile_b) > 0:
+                            if mcomp.phase_complete():
+                                mcomp.complete = True
+                                self.sort_pile(lcomp.last_pile + 1)
+                                self.sort_pile(lcomp.last_pile + 2)
+                                mcomp.turn = False
+                                for card in self.piles[MCOMP_HAND_PILE]:
+                                    card.face_down()
+                                rcomp.turn = True
+                                rcomp.draw_card = True
+                                for card in self.piles[RCOMP_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[mcomp.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, MCOMP_HAND_PILE)
+                                for card in self.piles[mcomp.phase_pile_b][:]:
+                                    self.move_card_to_new_pile(card, MCOMP_HAND_PILE)
+                                self.sort_pile(MCOMP_HAND_PILE)
+                        else:
+                            mcomp.turn = False
+                            for card in self.piles[MCOMP_HAND_PILE]:
+                                card.face_down()
+                            rcomp.turn = True
+                            rcomp.draw_card = True
+                            for card in self.piles[RCOMP_HAND_PILE]:
+                                card.face_up()
+
+                
+                
+                elif rcomp.turn:
+                    if rcomp.phase in PHASE_1_MATS:
+                        if len(rcomp.phase_pile) > 0:
+                            if rcomp.phase_complete():
+                                rcomp.complete = True
+                                self.sort_pile(mcomp.last_pile + 1)
+                                rcomp.turn = False
+                                for card in self.piles[RCOMP_HAND_PILE]:
+                                    card.face_down()
+                                user.turn = True
+                                user.draw_card = True
+                                for card in self.piles[USER_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[rcomp.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, RCOMP_HAND_PILE)
+                                self.sort_pile(RCOMP_HAND_PILE)
+                        else:
+                            rcomp.turn = False
+                            for card in self.piles[RCOMP_HAND_PILE]:
+                                card.face_down()
+                            user.turn = True
+                            user.draw_card = True
+                            for card in self.piles[USER_HAND_PILE]:
+                                card.face_up()
+                    
+                    elif rcomp.phase in PHASE_2_MATS:
+                        if len(rcomp.phase_pile) > 0 or len(rcomp.phase_pile_b) > 0:
+                            if rcomp.phase_complete():
+                                rcomp.complete = True
+                                self.sort_pile(mcomp.last_pile + 1)
+                                self.sort_pile(mcomp.last_pile + 2)
+                                rcomp.turn = False
+                                for card in self.piles[RCOMP_HAND_PILE]:
+                                    card.face_down()
+                                user.turn = True
+                                user.draw_card = True
+                                for card in self.piles[USER_HAND_PILE]:
+                                    card.face_up()
+                            else:
+                                for card in self.piles[rcomp.phase_pile][:]:
+                                    self.move_card_to_new_pile(card, RCOMP_HAND_PILE)
+                                for card in self.piles[rcomp.phase_pile_b][:]:
+                                    self.move_card_to_new_pile(card, RCOMP_HAND_PILE)
+                                self.sort_pile(RCOMP_HAND_PILE)
+                        else:
+                            rcomp.turn = False
+                            for card in self.piles[RCOMP_HAND_PILE]:
+                                card.face_down()
+                            user.turn = True
+                            user.draw_card = True
+                            for card in self.piles[USER_HAND_PILE]:
+                                card.face_up()
                 else:
                     pass
                 reset_position = False
                 #user.turn = False
-                user.draw_card = True
+                # user.draw_card = True
                 
                 # add change to turn flag
 
@@ -693,6 +1009,7 @@ class MyGame(arcade.Window):
                     mcomp.phase += 1
                 if rcomp.complete:
                     rcomp.phase += 1
+                # add score if len > 0
                 # add window to say round over, display scores / player rounds
                 self.setup()
             else:
