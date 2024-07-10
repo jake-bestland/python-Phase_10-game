@@ -850,7 +850,7 @@ class MyGame(arcade.Window):
                                 for card in self.piles[LCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[user.last_pile - 1][:]:
+                                for card in self.piles[user.last_pile][:]:
                                     self.move_card_to_new_pile(card, USER_HAND_PILE)
                                 self.sort_pile(USER_HAND_PILE)
                         else:
