@@ -349,9 +349,9 @@ class MyGame(arcade.Window):
         card.face_up()
         self.piles[DISCARD_PILE].append(card)
         card.position = self.pile_mat_list[DISCARD_PILE].position
-        # if a skip card is flipped over, skip first player
+        # if a skip card is flipped over, skip first player (user)
         if card.get_value() == "13":
-            user.skipped = True
+            # user.skipped = True
             user.turn = False
             for card in self.piles[USER_HAND_PILE]:
                 card.face_down()
@@ -488,20 +488,7 @@ class MyGame(arcade.Window):
                 if user.turn and user.draw_card:
                     user.draw_card_from_deck(self.piles, self.pile_mat_list, USER_HAND_PILE)
                     self.sort_pile(USER_HAND_PILE)
-                    # # Get top card
-                    # card = self.piles[DECK_FACE_DOWN_PILE][-1]
-                    # # Flip face up
-                    # card.face_up()
-                    # # Move card position to user hand pile
-                    # card.position = self.pile_mat_list[USER_HAND_PILE].position  ## maybe different position? and use pull_to_top instead of sort
-                    # # Remove card from face down pile
-                    # self.piles[DECK_FACE_DOWN_PILE].remove(card)
-                    # # Move card to user hand list
-                    # self.piles[USER_HAND_PILE].append(card)
-                    # # Put on top draw-order wise
-                    # # self.pull_to_top(card)
-                    # self.sort_pile(USER_HAND_PILE) ## maybe new position to better see which card was added?
-                    # user.turn = False
+
                 elif lcomp.turn and lcomp.draw_card:
                     lcomp.draw_card_from_deck(self.piles, self.pile_mat_list, LCOMP_HAND_PILE)
                     self.sort_pile(LCOMP_HAND_PILE)
@@ -680,6 +667,7 @@ class MyGame(arcade.Window):
                             top_card = self.piles[DISCARD_PILE][-1]
                             dropped_card.position = top_card.position
                             self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
+                            #need to add end turn
                         else:
                             draw_pile = True
                 else:
@@ -691,7 +679,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(card, pile_index)
                             user.draw_card = False
                     
-                    elif self.get_pile_for_card(self.held_cards[0]) == user.phase_pile or self.get_pile_for_card(self.held_cards[0]) == user.phase_pile_b:
+                    elif self.get_pile_for_card(self.held_cards[0]) == (user.last_pile -1) or self.get_pile_for_card(self.held_cards[0]) == user.last_pile:
                         for card in self.held_cards:
                             self.move_card_to_new_pile(card, pile_index)
                     else:
@@ -718,7 +706,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(card, pile_index)
                             lcomp.draw_card = False
                     
-                    elif self.get_pile_for_card(self.held_cards[0]) == lcomp.phase_pile or self.get_pile_for_card(self.held_cards[0]) == lcomp.phase_pile_b:
+                    elif self.get_pile_for_card(self.held_cards[0]) == (user.last_pile + 1) or self.get_pile_for_card(self.held_cards[0]) == (user.last_pile + 2):
                         for card in self.held_cards:
                             self.move_card_to_new_pile(card, pile_index)
                     else:
@@ -745,7 +733,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(card, pile_index)
                             mcomp.draw_card = False
                     
-                    elif self.get_pile_for_card(self.held_cards[0]) == mcomp.phase_pile or self.get_pile_for_card(self.held_cards[0]) == mcomp.phase_pile_b:
+                    elif self.get_pile_for_card(self.held_cards[0]) == (lcomp.last_pile + 1) or self.get_pile_for_card(self.held_cards[0]) == (lcomp.last_pile + 2):
                         for card in self.held_cards:
                             self.move_card_to_new_pile(card, pile_index)
                     else:
@@ -772,7 +760,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(card, pile_index)
                             rcomp.draw_card = False
                     
-                    elif self.get_pile_for_card(self.held_cards[0]) == rcomp.phase_pile or self.get_pile_for_card(self.held_cards[0]) == rcomp.phase_pile_b:
+                    elif self.get_pile_for_card(self.held_cards[0]) == (mcomp.last_pile + 1) or self.get_pile_for_card(self.held_cards[0]) == (mcomp.last_pile + 2):
                         for card in self.held_cards:
                             self.move_card_to_new_pile(card, pile_index)
                     else:
@@ -1096,7 +1084,7 @@ class MyGame(arcade.Window):
                     rcomp.phase += 1
                 # add score if len > 0
                 # add window to say round over, display scores / player rounds
-                self.setup()
+                # self.setup() -- add flag for a key press to move to next round
             else:
                 pass
 
