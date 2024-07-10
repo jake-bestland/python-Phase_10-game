@@ -376,7 +376,84 @@ class MyGame(arcade.Window):
         # Draw the cards
         self.card_list.draw()
 
-        # add all players score and phase
+        # Draw the scoreboard
+        user_name_text = f"Player 1:"
+        arcade.draw_text(
+            user_name_text,
+            10,
+            265,
+            arcade.csscolor.BLACK,
+            20,
+            bold=True
+        )
+
+        user_phase_text = f"Phase: {user.phase}    Score: {user.score}"
+        arcade.draw_text(
+            user_phase_text,
+            10,
+            240,
+            arcade.csscolor.BLACK,
+            15,
+        )
+
+        lcomp_name_text = f"Player: 2"
+        arcade.draw_text(
+            lcomp_name_text,
+            10,
+            190,
+            arcade.csscolor.BLACK,
+            20,
+            bold=True
+        )
+
+        lcomp_phase_text = f"Phase: {lcomp.phase}    Score: {lcomp.score}"
+        arcade.draw_text(
+            lcomp_phase_text,
+            10,
+            165,
+            arcade.csscolor.BLACK,
+            15
+        )
+
+        mcomp_name_text = f"Player: 3"
+        arcade.draw_text(
+            mcomp_name_text,
+            10,
+            115,
+            arcade.csscolor.BLACK,
+            20,
+            bold=True
+        )
+        
+        mcomp_phase_text = f"Phase: {mcomp.phase}    Score: {mcomp.score}"
+        arcade.draw_text(
+            mcomp_phase_text,
+            10,
+            90,
+            arcade.csscolor.BLACK,
+            15
+        )
+
+        rcomp_name_text = f"Player: 4"
+        arcade.draw_text(
+            rcomp_name_text,
+            10,
+            40,
+            arcade.csscolor.BLACK,
+            20,
+            bold=True
+        )
+
+        rcomp_phase_text = f"Phase: {rcomp.phase}    Score: {rcomp.score}"
+        arcade.draw_text(
+            rcomp_phase_text,
+            10,
+            15,
+            arcade.csscolor.BLACK,
+            15
+        )
+
+
 
     def pull_to_top(self, card: arcade.Sprite):
         """ Pull card to top of rendering order (last to render, looks on-top) """
@@ -600,7 +677,9 @@ class MyGame(arcade.Window):
                     for dropped_card in self.held_cards:
                         if dropped_card.get_value() == "13":
                             user.skipped = True
-                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                            top_card = self.piles[DISCARD_PILE][-1]
+                            dropped_card.position = top_card.position
+                            self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                         else:
                             draw_pile = True
                 else:
@@ -625,7 +704,9 @@ class MyGame(arcade.Window):
                     for dropped_card in self.held_cards:
                         if dropped_card.get_value() == "13":
                             lcomp.skipped = True
-                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                            top_card = self.piles[DISCARD_PILE][-1]
+                            dropped_card.position = top_card.position
+                            self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                         else:
                             draw_pile = True
                 else:
@@ -650,7 +731,9 @@ class MyGame(arcade.Window):
                     for dropped_card in self.held_cards:
                         if dropped_card.get_value() == "13":
                             mcomp.skipped = True
-                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                            top_card = self.piles[DISCARD_PILE][-1]
+                            dropped_card.position = top_card.position
+                            self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                         else:
                             draw_pile = True
                 else:
@@ -675,7 +758,9 @@ class MyGame(arcade.Window):
                     for dropped_card in self.held_cards:
                         if dropped_card.get_value() == "13":
                             rcomp.skipped = True
-                            self.move_card_to_new_pile(dropped_card, self.piles[DISCARD_PILE])
+                            top_card = self.piles[DISCARD_PILE][-1]
+                            dropped_card.position = top_card.position
+                            self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                         else:
                             draw_pile = True
                 else:
@@ -765,7 +850,7 @@ class MyGame(arcade.Window):
                                 for card in self.piles[LCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[user.phase_pile][:]:
+                                for card in self.piles[user.last_pile - 1][:]:
                                     self.move_card_to_new_pile(card, USER_HAND_PILE)
                                 self.sort_pile(USER_HAND_PILE)
                         else:
@@ -792,9 +877,9 @@ class MyGame(arcade.Window):
                                 for card in self.piles[LCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[user.phase_pile][:]:
+                                for card in self.piles[user.last_pile - 1][:]:
                                     self.move_card_to_new_pile(card, USER_HAND_PILE)
-                                for card in self.piles[user.phase_pile_b][:]:
+                                for card in self.piles[user.last_pile][:]:
                                     self.move_card_to_new_pile(card, USER_HAND_PILE)
                                 self.sort_pile(USER_HAND_PILE)
                         else:
@@ -822,7 +907,7 @@ class MyGame(arcade.Window):
                                 for card in self.piles[MCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[lcomp.phase_pile][:]:
+                                for card in self.piles[user.last_pile + 1][:]:
                                     self.move_card_to_new_pile(card, LCOMP_HAND_PILE)
                                 self.sort_pile(LCOMP_HAND_PILE)
                         else:
@@ -848,9 +933,9 @@ class MyGame(arcade.Window):
                                 for card in self.piles[MCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[lcomp.phase_pile][:]:
+                                for card in self.piles[user.last_pile + 1][:]:
                                     self.move_card_to_new_pile(card, LCOMP_HAND_PILE)
-                                for card in self.piles[lcomp.phase_pile_b][:]:
+                                for card in self.piles[user.last_pile + 2][:]:
                                     self.move_card_to_new_pile(card, LCOMP_HAND_PILE)
                                 self.sort_pile(LCOMP_HAND_PILE)
                         else:
@@ -878,7 +963,7 @@ class MyGame(arcade.Window):
                                 for card in self.piles[RCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[mcomp.phase_pile][:]:
+                                for card in self.piles[lcomp.last_pile + 1][:]:
                                     self.move_card_to_new_pile(card, MCOMP_HAND_PILE)
                                 self.sort_pile(MCOMP_HAND_PILE)
                         else:
@@ -904,9 +989,9 @@ class MyGame(arcade.Window):
                                 for card in self.piles[RCOMP_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[mcomp.phase_pile][:]:
+                                for card in self.piles[lcomp.last_pile + 1][:]:
                                     self.move_card_to_new_pile(card, MCOMP_HAND_PILE)
-                                for card in self.piles[mcomp.phase_pile_b][:]:
+                                for card in self.piles[lcomp.last_pile + 2][:]:
                                     self.move_card_to_new_pile(card, MCOMP_HAND_PILE)
                                 self.sort_pile(MCOMP_HAND_PILE)
                         else:
@@ -934,7 +1019,7 @@ class MyGame(arcade.Window):
                                 for card in self.piles[USER_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[rcomp.phase_pile][:]:
+                                for card in self.piles[mcomp.last_pile + 1][:]:
                                     self.move_card_to_new_pile(card, RCOMP_HAND_PILE)
                                 self.sort_pile(RCOMP_HAND_PILE)
                         else:
@@ -960,9 +1045,9 @@ class MyGame(arcade.Window):
                                 for card in self.piles[USER_HAND_PILE]:
                                     card.face_up()
                             else:
-                                for card in self.piles[rcomp.phase_pile][:]:
+                                for card in self.piles[mcomp.last_pile + 1][:]:
                                     self.move_card_to_new_pile(card, RCOMP_HAND_PILE)
-                                for card in self.piles[rcomp.phase_pile_b][:]:
+                                for card in self.piles[mcomp.last_pile + 2][:]:
                                     self.move_card_to_new_pile(card, RCOMP_HAND_PILE)
                                 self.sort_pile(RCOMP_HAND_PILE)
                         else:
