@@ -328,7 +328,8 @@ class MyGame(arcade.Window):
         for j in range(10):
             # Pop the card off the deck we are dealing from and turn face-up
             card = self.piles[DECK_FACE_DOWN_PILE].pop()
-            card.face_up()
+            # if self.player_list[0].turn == True:
+            #     card.face_up()
             # Put in the proper pile
             if len(self.piles[USER_HAND_PILE]) > 0:
                 # Move cards to proper position
@@ -368,6 +369,9 @@ class MyGame(arcade.Window):
                 # Sort cards in pile
                 self.sort_pile(pile_no)
 
+        # Flip over cards in hand for whose turn it is
+        for card in self.piles[self.player_list[turn].hand]:
+            card.face_up()
         # Flip over top card from main deck to face-up/ discard pile
         card = self.piles[DECK_FACE_DOWN_PILE].pop()
         card.face_up()
