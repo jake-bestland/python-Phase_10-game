@@ -1,19 +1,65 @@
 import arcade
-from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2, CARD_HORIZONTAL_OFFSET
+from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2, CARD_HORIZONTAL_OFFSET, DECK_FACE_DOWN_PILE
 
 
 # add hand param. then in phase complete method, if false return cards to hand?
 class Player:
-    def __init__(self, name, phase=1, turn=False, score=0):  
+    def __init__(self, name, hand, phase=1, turn=False, score=0):  
         self.name = name
+        # self.player_number = player_number
         self.phase = phase
+        self.hand = hand
         self.turn = turn
         self.score = score
         self.phase_pile = None
         self.phase_pile_b = None
         self.last_pile = None
+        self.skipped = False
         self.draw_card = True
         self.complete = False
+
+    def draw_card_from_deck(self, pile_list, pile_mat_list, deck_index, hand):
+        self.pile_list = pile_list
+        self.pile_mat_list = pile_mat_list
+        self.deck_index = deck_index
+        self.hand = hand
+
+        card = self.pile_list[self.deck_index][-1]
+        card.face_up()
+        card.position = pile_mat_list[self.hand].position
+        self.pile_list[self.deck_index].remove(card)
+        self.pile_list[self.hand].append(card)
+        self.draw_card = False
+
+    # def discard(self, pile_list, hand):
+    #     self.pile_list = pile_list
+    #     self.hand = hand
+    #     if self.phase in PHASE_1_MATS:
+    #         if len(self.phase_pile) > 0:
+    #             if self.phase_complete():
+    #                 self.complete = True
+    #                 self.sort_pile(self.phase_pile)
+    #             else:
+    #                 for card in self.pile_list[self.phase_pile][:]:
+    #                     self.move_card_to_new_pile(card, self.hand)
+    #                     self.sort_pile(self.hand)
+    #         else:
+    #             pass
+
+    #     elif self.phase in PHASE_2_MATS:
+    #         if len(self.phase_pile) > 0 or len(self.phase_pile_b) > 0:
+    #             if self.phase_complete():
+    #                 self.complete = True
+    #                 self.sort_pile(self.phase_pile)
+    #                 self.sort_pile(self.phase_pile_b)
+    #             else:
+    #                 for card in self.piles[self.phase_pile][:]:
+    #                     self.move_card_to_new_pile(card, self.hand)
+    #                 for card in self.piles[self.phase_pile_b][:]:
+    #                     self.move_card_to_new_pile(card, self.hand)
+    #                 self.sort_pile(self.hand)
+    #         else:
+    #             pass
 
     def determine_phase_piles(self, pile_list, last_pile=5):
         self.pile_list = pile_list
@@ -62,16 +108,19 @@ class Player:
         # create an empty result list for acceptable cards and bad list for invalid cards
         res = []
         bad = []
-        # assign first card in pile to variable to check value against
-        card_1 = self.pile[0]
-        for card in self.pile:
-            if card.get_value() == card_1.get_value():
-                res.append(card)
-            elif card.get_value() == "12":
-                res.append(card)
-            else:
-                bad.append(card)
-            
+        # if there are no cards
+        if len(self.pile) > 0:
+            # assign first card in pile to variable to check value against
+            card_1 = self.pile[0]
+            for card in self.pile:
+                if card.get_value() == card_1.get_value():
+                    res.append(card)
+                elif card.get_value() == "12":
+                    res.append(card)
+                else:
+                    bad.append(card)
+        else:
+            return False    
         return len(res) >= self.amount and len(bad) == 0
 
     def check_color(self, amount, pile):
@@ -81,16 +130,18 @@ class Player:
         # create an empty result list for acceptable cards and bad list for invalid cards
         res = []
         bad = []
-        # assign first card in pile to variable to check color against
-        card_1 = self.pile[0]
-        for card in self.pile:
-            if card.get_value() == "12":
-                res.append(card)
-            if card.get_color() == card_1.get_color():
-                res.append(card)
-            else:
-                bad.append(card)
-
+        if len(self.pile) > 0:
+            # assign first card in pile to variable to check color against
+            card_1 = self.pile[0]
+            for card in self.pile:
+                if card.get_value() == "12":
+                    res.append(card)
+                if card.get_color() == card_1.get_color():
+                    res.append(card)
+                else:
+                    bad.append(card)
+        else:
+            return False
         return len(res) >= self.amount and len(bad) == 0
 
     def check_run(self, amount, pile):
@@ -103,16 +154,18 @@ class Player:
         wild = []
         # list of the numbered cards (non-wild/skip cards)
         num = []
-        # sort cards into appropriate list
-        # skip cards to bad list, wild cards into wild list, and numbered cards into num list
-        for card in self.pile:
-            if card.get_value() == "13":
-                bad.append(card)
-            elif card.get_value() == "12":
-                wild.append(card)
-            else:
-                num.append(card)
-
+        if len(self.pile) > 0:
+            # sort cards into appropriate list
+            # skip cards to bad list, wild cards into wild list, and numbered cards into num list
+            for card in self.pile:
+                if card.get_value() == "13":
+                    bad.append(card)
+                elif card.get_value() == "12":
+                    wild.append(card)
+                else:
+                    num.append(card)
+        else:
+            return False
         # itereate over numbered cards and start forming run of cards
         for card in num:
             if len(res) > 0:
@@ -177,64 +230,52 @@ class Player:
         elif self.phase == 3:
             return (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
                 or (self.check_set(4, self.phase_pile_b) and self.check_run(4, self.phase_pile))
-            # if (self.check_set(4, self.phase_pile) and self.check_run(4, self.phase_pile_b))\
-            #     or (self.check_set(4, self.phase_pile_b) and self.check_run(4, self.phase_pile)):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 4:
             return self.check_run(7, self.phase_pile)
-            # if self.check_run(7, self.phase_pile):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 5:
             return self.check_run(8, self.phase_pile)
-            # if self.check_run(8, self.phase_pile):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 6:
             return self.check_run(9, self.phase_pile)
-            # if self.check_run(9, self.phase_pile):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 7:
             return self.check_set(4, self.phase_pile_b) and self.check_set(4, self.phase_pile)
-            # if self.check_set(4, self.phase_pile_b) and self.check_set(4, self.phase_pile):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 8:
             return self.check_color(7, self.phase_pile)
-            # if self.check_color(7, self.phase_pile):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 9:
             return (self.check_set(5, self.phase_pile) and self.check_set(2, self.phase_pile_b))\
                 or (self.check_set(5, self.phase_pile_b) and self.check_set(2, self.phase_pile))
-            # if (self.check_set(5, self.phase_pile) and self.check_set(2, self.phase_pile_b))\
-            #     or (self.check_set(5, self.phase_pile_b) and self.check_set(2, self.phase_pile)):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
 
         elif self.phase == 10:
             return (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
                 or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile))
-            # if (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
-            #     or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile)):
-            #     self.phase_complete = True
-            # else:
-            #     self.phase_complete = False
+
+    # def end_turn(self, pile_list, n):
+    #     self.pile_list = pile_list
+    #     self.n = n
+    #     # self.player_list = player_list
+        
+    #     self.turn = False
+    #     for card in self.pile_list[self.hand]:
+    #         card.face_down()
+    #     if n < 3:
+    #         self.n = self.n + 1
+    #     else:
+    #         self.n = self.n - 3
+    #     print(self.name)
+    #     self.turn = True
+    #     self.draw_card = True
+    #     for card in self.pile_list[self.hand]:
+    #         card.face_up()
+
+            
+        
+        
+
 
     def add_score(self, hand):
         """at end of round, add the point total for each card remaining in hand to total score."""
@@ -253,12 +294,7 @@ class Player:
             pass
         print(self.score)
 
-class User(Player):  # may not need
-    def __init__(self, name, turn, phase=1, phase_complete=False, score=0):
-        super().__init__(name, turn, phase, phase_complete, score)
-
-    ## add func to figure out phase piles
-
+### use this class to create computter AI methods
 class Comp(Player):
     def __init__(self, name, turn, phase=1, phase_complete=False, score=0):
         super().__init__(name, turn, phase, phase_complete, score)
