@@ -5,6 +5,7 @@ from typing import Optional
 
 import random
 import arcade
+import arcade.csscolor
 from player_class import Player
 
 # Screen title and size
@@ -137,6 +138,7 @@ class Card(arcade.Sprite):
             self.points = 15
         else:
             self.points += 25
+        return self.points
 
     def face_down(self):
         """ Turn card face-down """
@@ -399,6 +401,30 @@ class MyGame(arcade.Window):
         # Draw the cards
         self.card_list.draw()
 
+        # Draw phase list # -- leave spaces after each line so that the width doesn't cut off anything unwantes for multiline
+        phase_list_text = """\
+        The phases are:              
+        1. 2 sets of 3              
+        2. 1 set of 3 + 1 run of 4  
+        3. 1 set of 4 + 1 run of 4      
+        4. 1 run of 7               
+        5. 1 run of 8               
+        6. 1 run of 9               
+        7. 2 sets of 4              
+        8. 7 cards of 1 color       
+        9. 1 set of 5 + 1 set of 2  
+        10. 1 set of 5 + 1 set of 3 
+        """
+        arcade.draw_text(
+            phase_list_text,
+            1050,
+            265,
+            arcade.csscolor.BLACK,
+            15,
+            width=280,
+            multiline=True
+        )
+
         # Draw the scoreboard
         user_name_text = f"Player 1:"
         arcade.draw_text(
@@ -491,6 +517,8 @@ class MyGame(arcade.Window):
             self.setup()
 
         ## add key to diplay scoreboard, rules or phase requirements?
+
+    
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """ Called when the user presses a mouse button. """
@@ -766,7 +794,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                             else:
-                                dropped_card.position = self.piles[DISCARD_PILE].position
+                                dropped_card.position = self.pile_mat_list[DISCARD_PILE].position
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                         else:
@@ -791,7 +819,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                             else:
-                                dropped_card.position = self.piles[DISCARD_PILE].position
+                                dropped_card.position = self.pile_mat_list[DISCARD_PILE].position
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                         else:
@@ -816,7 +844,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                             else:
-                                dropped_card.position = self.piles[DISCARD_PILE].position
+                                dropped_card.position = self.pile_mat_list[DISCARD_PILE].position
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                         else:
@@ -841,7 +869,7 @@ class MyGame(arcade.Window):
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                             else:
-                                dropped_card.position = self.piles[DISCARD_PILE].position
+                                dropped_card.position = self.pile_mat_list[DISCARD_PILE].position
                                 self.move_card_to_new_pile(dropped_card, DISCARD_PILE)
                                 self.end_turn(n)
                         else:
@@ -1168,6 +1196,7 @@ class MyGame(arcade.Window):
                 for player in self.player_list:
                     if player.complete:
                         player.phase += 1
+                    player.add_score(self.piles)
                 # add score if len > 0
                 # add window to say round over, display scores / player rounds
                 # print(self.player_list[0].phase)
