@@ -277,19 +277,12 @@ class Player:
         
 
 
-    def add_score(self, hand):
+    def add_score(self, pile):
         """at end of round, add the point total for each card remaining in hand to total score."""
-        self.hand = hand
-        if len(self.hand) > 0:
-            for card in self.hand:
-                if int(card.get_value()) in range(0, 9):
-                    self.score += 5
-                elif int(card.get_value()) in range(9, 12):
-                    self.score += 10
-                elif card.get_value() == "13":
-                    self.score += 15
-                else:
-                    self.score += 25
+        self.pile = pile
+        if len(self.pile[self.hand]) > 0:
+            for card in self.pile[self.hand]:
+                self.score += card.get_points()
         else:
             pass
         print(self.score)
