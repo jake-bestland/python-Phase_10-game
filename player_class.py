@@ -31,36 +31,6 @@ class Player:
         self.pile_list[self.hand].append(card)
         self.draw_card = False
 
-    # def discard(self, pile_list, hand):
-    #     self.pile_list = pile_list
-    #     self.hand = hand
-    #     if self.phase in PHASE_1_MATS:
-    #         if len(self.phase_pile) > 0:
-    #             if self.phase_complete():
-    #                 self.complete = True
-    #                 self.sort_pile(self.phase_pile)
-    #             else:
-    #                 for card in self.pile_list[self.phase_pile][:]:
-    #                     self.move_card_to_new_pile(card, self.hand)
-    #                     self.sort_pile(self.hand)
-    #         else:
-    #             pass
-
-    #     elif self.phase in PHASE_2_MATS:
-    #         if len(self.phase_pile) > 0 or len(self.phase_pile_b) > 0:
-    #             if self.phase_complete():
-    #                 self.complete = True
-    #                 self.sort_pile(self.phase_pile)
-    #                 self.sort_pile(self.phase_pile_b)
-    #             else:
-    #                 for card in self.piles[self.phase_pile][:]:
-    #                     self.move_card_to_new_pile(card, self.hand)
-    #                 for card in self.piles[self.phase_pile_b][:]:
-    #                     self.move_card_to_new_pile(card, self.hand)
-    #                 self.sort_pile(self.hand)
-    #         else:
-    #             pass
-
     def determine_phase_piles(self, pile_list, last_pile=5):
         self.pile_list = pile_list
         self.last_pile = last_pile
@@ -94,9 +64,11 @@ class Player:
         elif self.name == "rcomp":
             if self.phase in PHASE_1_MATS:
                 self.phase_pile = self.pile_list[self.last_pile + 1]
+                self.last_pile = self.last_pile + 1
             elif self.phase in PHASE_2_MATS:
                 self.phase_pile = self.pile_list[self.last_pile + 1]
-                self.phase_pile_b = self.pile_list[self.last_pile + 2]    
+                self.phase_pile_b = self.pile_list[self.last_pile + 2]
+                self.last_pile = self.last_pile + 2
 
     def check_set(self, amount, pile):
         """check to see if cards in phase pile meets the phase requirement for a set.
@@ -134,9 +106,12 @@ class Player:
             # assign first card in pile to variable to check color against
             card_1 = self.pile[0]
             for card in self.pile:
-                if card.get_value() == "12":
+                print(card.get_color())
+                if card.get_value() == "13":
+                    bad.append(card)
+                elif card.get_value() == "12":
                     res.append(card)
-                if card.get_color() == card_1.get_color():
+                elif card.get_color() == card_1.get_color():
                     res.append(card)
                 else:
                     bad.append(card)
@@ -166,7 +141,7 @@ class Player:
                     num.append(card)
         else:
             return False
-        # itereate over numbered cards and start forming run of cards
+        # loop over numbered cards and start forming run of cards
         for card in num:
             if len(res) > 0:
                 # check if the second card is one number higher than first
@@ -197,7 +172,7 @@ class Player:
         while len(wild) > 0:
             prev_card = res[-1]
             new_card = wild.pop()
-            # check if last card is 12, or the highest card
+            # check if last card is 12 (the highest card)
             if int(prev_card.get_value()) < 11:
                 new_card.change_value(int(prev_card.get_value()) + 1)
                 res.append(new_card)
@@ -253,28 +228,6 @@ class Player:
         elif self.phase == 10:
             return (self.check_set(5, self.phase_pile) and self.check_set(3, self.phase_pile_b))\
                 or (self.check_set(5, self.phase_pile_b) and self.check_set(3, self.phase_pile))
-
-    # def end_turn(self, pile_list, n):
-    #     self.pile_list = pile_list
-    #     self.n = n
-    #     # self.player_list = player_list
-        
-    #     self.turn = False
-    #     for card in self.pile_list[self.hand]:
-    #         card.face_down()
-    #     if n < 3:
-    #         self.n = self.n + 1
-    #     else:
-    #         self.n = self.n - 3
-    #     print(self.name)
-    #     self.turn = True
-    #     self.draw_card = True
-    #     for card in self.pile_list[self.hand]:
-    #         card.face_up()
-
-            
-        
-        
 
 
     def add_score(self, pile):
