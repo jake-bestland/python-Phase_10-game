@@ -179,7 +179,7 @@ class MyGame(arcade.Window):
         # Sprite list with all the cards, no matter what pile they are in.
         self.card_list: Optional[arcade.SpriteList] = None
 
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.DARK_GRAY)
 
         # List of cards we are dragging with the mouse
         self.held_cards = None
@@ -207,26 +207,26 @@ class MyGame(arcade.Window):
         if self.pile_x == USER_HAND_X:
             # one phase mat
             if self.phase in PHASE_1_MATS:
-                pile = arcade.SpriteSolidColor(PHASE_1_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.BLUE)
+                pile = arcade.SpriteSolidColor(PHASE_1_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_SLATE_GRAY)
                 pile.position = self.pile_x, BOTTOM_PHASE_Y
                 self.pile_mat_list.append(pile)
             # two phase mats
             elif self.phase in PHASE_2_MATS:
                 for i in range(2):
-                    pile = arcade.SpriteSolidColor(PHASE_2_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.YELLOW)
+                    pile = arcade.SpriteSolidColor(PHASE_2_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_SLATE_GRAY)
                     pile.position = (self.pile_x - .034 * HAND_MAT_WIDTH - PHASE_2_MAT_WIDTH / 2) + i * PHASE_2_X_SPACING, BOTTOM_PHASE_Y
                     self.pile_mat_list.append(pile)
         # create phase mats for the 3 computers
         else:
             # One phase mat
             if self.phase in PHASE_1_MATS:
-                pile = arcade.SpriteSolidColor(PHASE_1_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.BLUE)
+                pile = arcade.SpriteSolidColor(PHASE_1_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_SLATE_GRAY)
                 pile.position = self.pile_x, TOP_PHASE_Y
                 self.pile_mat_list.append(pile)
             # Two phase mats
             elif self.phase in PHASE_2_MATS:
                 for i in range(2):
-                    pile = arcade.SpriteSolidColor(PHASE_2_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.YELLOW)
+                    pile = arcade.SpriteSolidColor(PHASE_2_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_SLATE_GRAY)
                     pile.position = (self.pile_x - .034 * HAND_MAT_WIDTH - PHASE_2_MAT_WIDTH / 2) + i * PHASE_2_X_SPACING, TOP_PHASE_Y
                     self.pile_mat_list.append(pile)
 
@@ -244,6 +244,8 @@ class MyGame(arcade.Window):
         self.player_list = []
 
         self.game_over = False
+
+        self.keep_playing = True
 
         # # create players
         # user = Player("user", USER_HAND_PILE, 1, True)
@@ -264,24 +266,37 @@ class MyGame(arcade.Window):
         self.pile_mat_list: arcade.SpriteList = arcade.SpriteList()
 
         # Create the mats for the DECK face down and face up piles
-        pile = arcade.SpriteSolidColor(DECK_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+        pile = arcade.SpriteSolidColor(DECK_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_SLATE_GRAY)
         pile.position = DECK_X, DECK_Y
         self.pile_mat_list.append(pile)
 
-        pile = arcade.SpriteSolidColor(DECK_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+        pile = arcade.SpriteSolidColor(DECK_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_SLATE_GRAY)
         pile.position = DECK_X + DECK_X_SPACING, DECK_Y
         self.pile_mat_list.append(pile)
 
         # Create the USER hand pile
-        pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+        pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.BLUE)
         pile.position = USER_HAND_X, BOTTOM_Y
         self.pile_mat_list.append(pile)
 
         # Create the COMP hand piles
-        for i in range(3):
-            pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.RED)
-            pile.position = COMP_HAND_X + i * HAND_X_SPACING, COMP_HAND_Y
-            self.pile_mat_list.append(pile)
+        # for i in range(3):
+        #     pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.RED)
+        #     pile.position = COMP_HAND_X + i * HAND_X_SPACING, COMP_HAND_Y
+        #     self.pile_mat_list.append(pile)
+
+        pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.GREEN)
+        pile.position = COMP_HAND_X, COMP_HAND_Y
+        self.pile_mat_list.append(pile)
+
+        pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.RED)
+        pile.position = COMP_HAND_X + HAND_X_SPACING, COMP_HAND_Y
+        self.pile_mat_list.append(pile)
+
+        pile = arcade.SpriteSolidColor(HAND_MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.YELLOW)
+        pile.position = COMP_HAND_X + 2 * HAND_X_SPACING, COMP_HAND_Y
+        self.pile_mat_list.append(pile)
+
 
         # Create the Phase piles
         self.create_phase_mats(USER_HAND_X, user.phase)
@@ -404,7 +419,7 @@ class MyGame(arcade.Window):
         # Draw text to draw/pickup card
         n = self.get_turn()
         draw_card_text = f"* Draw or pickup a card *"
-        if self.player_list[n].turn and self.player_list[n].draw_card:
+        if self.player_list[n].turn and self.player_list[n].draw_card and self.game_over == False:
             arcade.draw_text(
                 draw_card_text,
                 DECK_X - 3 * DECK_MAT_WIDTH,
@@ -413,6 +428,37 @@ class MyGame(arcade.Window):
                 15
             )
         
+        # Draw winner
+        if self.game_over == True:
+            if self.winner.name == "user":
+                player_text = "Player 1"
+            elif self.winner.name == "lcomp":
+                player_text = "Player 2"
+            elif self.winner.name == "mcomp":
+                player_text = "Player 3"
+            elif self.winner.name == "rcomp":
+                player_text = "Player 4"
+            arcade.draw_text(
+                f"*{player_text} Wins!!*",
+                DECK_X + 3 * DECK_MAT_WIDTH,
+                DECK_Y,
+                arcade.csscolor.BLACK,
+                38
+                )
+            
+            arcade.draw_text(
+                "*GAME OVER!*",
+                DECK_X - 5 * DECK_MAT_WIDTH,
+                DECK_Y,
+                arcade.csscolor.BLACK,
+                38
+            )
+        # if self.held_cards[0].get_value() == "13":
+        #     arcade.draw_texture_rectangle
+
+        # 
+
+
         # Draw phase list # -- leave spaces after each line so that the width doesn't cut off anything unwantes for multiline
         phase_list_text = """\
         The phases are:              
@@ -443,7 +489,7 @@ class MyGame(arcade.Window):
             user_name_text,
             10,
             265,
-            arcade.csscolor.BLACK,
+            arcade.csscolor.BLUE,
             20,
             bold=True
         )
@@ -462,7 +508,7 @@ class MyGame(arcade.Window):
             lcomp_name_text,
             10,
             190,
-            arcade.csscolor.BLACK,
+            arcade.csscolor.GREEN,
             20,
             bold=True
         )
@@ -481,7 +527,7 @@ class MyGame(arcade.Window):
             mcomp_name_text,
             10,
             115,
-            arcade.csscolor.BLACK,
+            arcade.csscolor.RED,
             20,
             bold=True
         )
@@ -500,7 +546,7 @@ class MyGame(arcade.Window):
             rcomp_name_text,
             10,
             40,
-            arcade.csscolor.BLACK,
+            arcade.csscolor.YELLOW,
             20,
             bold=True
         )
@@ -1448,18 +1494,28 @@ class MyGame(arcade.Window):
     def round_over(self): # need to add win on final phase
         for pile_no in range(USER_HAND_PILE, RCOMP_HAND_PILE + 1):
             if len(self.piles[pile_no]) == 0:
-                for player in self.player_list:
-                    player.add_score(self.piles)
-                    if player.complete:
-                        if player.phase < 10:
+                self.discard()
+                if len(self.piles[pile_no]) == 0:
+                    for player in self.player_list:
+                        player.add_score(self.piles)
+                        if player.complete:
                             player.phase += 1
+                    for player in self.player_list:
+                        if player.phase <= 10:
                             player.complete = False
                         else:
+                            self.keep_playing = False
                             self.game_over = True
+                            win_list = []
+                            if player.phase == 11:
+                                win_list.append(player)
+                            score_dict = {player: player.score for player in win_list}
+                            score_list = (sorted(score_dict.items(), key= lambda item: item[1]))
+                            self.winner = score_list[0][0]
                             # write game over window.
-                    
-                self.setup() # -- add flag for a key press to move to next round
-                self.on_draw()
+                    if self.keep_playing == True:
+                        self.setup() # -- add flag for a key press to move to next round
+                        self.on_draw()
             else:
                 pass
 
