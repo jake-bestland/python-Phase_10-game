@@ -68,18 +68,19 @@ FACE_DOWN_IMAGE = "./images/card_back.png"
 # Constants that represent "what pile is what" for the game
 PILE_COUNT = 14
 DECK_FACE_DOWN_PILE = 0
-DECK_FACE_UP_PILE = 1
+DISCARD_PILE = 1
 USER_HAND_PILE = 2
 LCOMP_HAND_PILE = 3
 MCOMP_HAND_PILE = 4
 RCOMP_HAND_PILE = 5
 PHASE_PILE_1 = 6
 PHASE_PILE_2 = 7
-PHASE_PILE_3 = 8
-PHASE_PILE_4 = 9
-PHASE_PILE_5 = 10
-PHASE_PILE_6 = 11
-PHASE_PILE_7 = 12
+# might not need rest
+# PHASE_PILE_3 = 8
+# PHASE_PILE_4 = 9
+# PHASE_PILE_5 = 10
+# PHASE_PILE_6 = 11
+# PHASE_PILE_7 = 12
 PHASE_PILE_8 = 13
 
 # List of phases that require 1 or 2 mat piles
