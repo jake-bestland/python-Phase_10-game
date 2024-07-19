@@ -5,8 +5,7 @@ from typing import Optional
 
 import random
 import arcade
-import arcade.csscolor
-import arcade.csscolor
+import webbrowser
 from player_class import Player
 
 # Screen title and size
@@ -82,13 +81,7 @@ MCOMP_HAND_PILE = 4
 RCOMP_HAND_PILE = 5
 PHASE_PILE_1 = 6
 PHASE_PILE_2 = 7
-## might not need 3 - 7
-# PHASE_PILE_3 = 8
-# PHASE_PILE_4 = 9
-# PHASE_PILE_5 = 10
-# PHASE_PILE_6 = 11
-# PHASE_PILE_7 = 12
-PHASE_PILE_8 = 13
+LAST_PHASE_PILE = 13
 
 # List of phases that require 1 or 2 mat piles
 PHASE_1_MATS = [4, 5, 6, 8]
@@ -165,10 +158,10 @@ class Card(arcade.Sprite):
         return not self.is_face_up
 
 # create players
-user = Player("user", USER_HAND_PILE, 8, True)
-lcomp = Player("lcomp", LCOMP_HAND_PILE, 8)
-mcomp = Player("mcomp", MCOMP_HAND_PILE, 8)
-rcomp = Player("rcomp", RCOMP_HAND_PILE, 8)
+user = Player("user", USER_HAND_PILE, 1, True)
+lcomp = Player("lcomp", LCOMP_HAND_PILE, 1)
+mcomp = Player("mcomp", MCOMP_HAND_PILE, 1)
+rcomp = Player("rcomp", RCOMP_HAND_PILE, 1)
 
 class MyGame(arcade.Window):
     """ Main application class. """
@@ -456,30 +449,44 @@ class MyGame(arcade.Window):
         # if self.held_cards[0].get_value() == "13":
         #     arcade.draw_texture_rectangle
 
-        # 
+        # Draw instructions
+        instruction_text = """\
+        Press * SPACE * for 
+        complete instructions
+        """
+        arcade.draw_text(
+            instruction_text,
+            875,
+            235,
+            arcade.csscolor.BLACK,
+            12,
+            width=260,
+            multiline=True
+        )
 
 
         # Draw phase list # -- leave spaces after each line so that the width doesn't cut off anything unwantes for multiline
         phase_list_text = """\
-        The phases are:              
-        1. 2 sets of 3              
-        2. 1 set of 3 + 1 run of 4  
-        3. 1 set of 4 + 1 run of 4      
-        4. 1 run of 7               
-        5. 1 run of 8               
-        6. 1 run of 9               
-        7. 2 sets of 4              
-        8. 7 cards of 1 color       
-        9. 1 set of 5 + 1 set of 2  
+          The phases are:              
+          1. 2 sets of 3              
+          2. 1 set of 3 + 1 run of 4  
+          3. 1 set of 4 + 1 run of 4      
+          4. 1 run of 7               
+          5. 1 run of 8               
+          6. 1 run of 9               
+          7. 2 sets of 4              
+          8. 7 cards of 1 color       
+          9. 1 set of 5 + 1 set of 2  
         10. 1 set of 5 + 1 set of 3 
         """
         arcade.draw_text(
             phase_list_text,
-            1050,
+            1040,
             265,
             arcade.csscolor.BLACK,
             15,
-            width=280,
+            width=290,
+            bold=True,
             multiline=True
         )
 
@@ -568,11 +575,19 @@ class MyGame(arcade.Window):
         self.card_list.remove(card)
         self.card_list.append(card)
 
+    def get_instructions(self):
+        info_url = "https://www.instructables.com/How-to-Play-Phase-10/"
+        webbrowser.open(info_url)
+    
+    
     def on_key_press(self, symbol: int, modifiers: int):
         """ User presses key """
         if symbol == arcade.key.R:
             # Restart
             self.setup()
+
+        if symbol == arcade.key.SPACE:
+            self.get_instructions()
 
         ## add key to diplay scoreboard, rules or phase requirements? -- open webpage with rules
 
@@ -617,7 +632,7 @@ class MyGame(arcade.Window):
             elif USER_HAND_PILE <= pile_index <= RCOMP_HAND_PILE and pile_index != self.player_list[n].hand:
                 pass
 
-            elif PHASE_PILE_1 <= pile_index <= PHASE_PILE_8:
+            elif PHASE_PILE_1 <= pile_index <= LAST_PHASE_PILE:
                 if self.player_list[n].phase in PHASE_1_MATS:
                     # if not players phase pile
                     if pile_index == self.player_list[n].last_pile:
@@ -1095,7 +1110,7 @@ class MyGame(arcade.Window):
                 # reset_position = draw_pile
 
 
-            elif PHASE_PILE_1 <= pile_index <= PHASE_PILE_8:
+            elif PHASE_PILE_1 <= pile_index <= LAST_PHASE_PILE:
                 # check if current player has 1 or 2 phase piles
                 if self.player_list[n].phase in PHASE_1_MATS:
                     # if players own phase pile
