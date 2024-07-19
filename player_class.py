@@ -238,7 +238,7 @@ class Player:
                 self.score += card.get_points()
         else:
             pass
-        print(self.score)
+        # print(self.score)
 
 ### use this class to create computter AI methods
 class Comp(Player):
