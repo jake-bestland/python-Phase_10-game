@@ -86,3 +86,12 @@ The winner of the round scores zero.  All remaining players score points against
 - 10 points for each card numbered 10-12
 - 15 points for each "Skip" card
 - 25 points for each "Wild" card
+
+
+
+# Fast forward/ Save place
+The game can take some time to complete.  If you do not want to play the whole length of the game, you can change which phase each player starts on.
+Or if you want to continue playing the game later, you can write down each players score and which Phase they're on and manually enter it before you start again.
+(that feature can be added later - writing/reading file)
+In the `phase_10.py` file, on lines 163-166 (where the players are created) you can change which phase each player starts on, and/or you can manually enter
+their score (If you want to pick up where you left off).
