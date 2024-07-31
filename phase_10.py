@@ -1319,6 +1319,7 @@ class MyGame(arcade.Window):
     
     def round_over(self):
         """check to see if the round is over or if someone has won."""
+        n = self.get_turn()
         for pile_no in range(USER_HAND_PILE, RCOMP_HAND_PILE + 1):
             if len(self.piles[pile_no]) == 0:
                 self.discard()
@@ -1340,6 +1341,24 @@ class MyGame(arcade.Window):
                             score_list = (sorted(score_dict.items(), key= lambda item: item[1]))
                             self.winner = score_list[0][0]
                     if self.keep_playing == True:
+                        self.player_list[n].turn = False
+                        if n < 3:
+                            new_n = n + 1
+                        else:
+                            new_n= n - 3
+                        while True:
+                            if self.player_list[new_n].skipped == False:
+                                self.player_list[new_n].turn = True
+                                self.player_list[new_n].draw_card = True
+                                break
+
+                            elif self.player_list[new_n].skipped == True:
+                                self.player_list[new_n].skipped = False
+                                if new_n < 3:
+                                    new_n += 1
+                                else:
+                                    new_n -= 3
+                                continue
                         self.setup() # -- add flag for a key press to move to next round
                         self.on_draw()
             else:
