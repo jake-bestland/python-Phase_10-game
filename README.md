@@ -16,18 +16,19 @@ arcade 2.6.17
 
 ### Installation
 
-After cloning the repo into a new folder, run the following commands in your terminal:
-"""
-cd new-folder
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-"""
+To install, clone the repo into a new folder, set up and activate a virtual environment, then install the using the following commands:
+```shell
+$ git clone git@github.com:jake-bestland/Phase_10.git
+$ cd new-folder
+$ python -m venv venv
+$ source ./venv/bin/activate
+$ pip install -r requirements.txt
+```
 
 To run the game, enter the following command into your teminal:
-"""
-python phase_10.py
-"""
+```shell
+$ python phase_10.py
+```
 
 
 ### Instructions
