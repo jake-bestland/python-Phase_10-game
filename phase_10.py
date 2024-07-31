@@ -6,8 +6,6 @@ from typing import Optional
 import random
 import arcade
 import webbrowser
-
-import arcade.csscolor
 from player_class import Player
 
 # Screen title and size
@@ -1012,7 +1010,6 @@ class MyGame(arcade.Window):
                         # check if you are "hitting" or adding to your own phase pile after you have already completed phase on a previous turn
                         if self.player_list[n].complete:
                             self.hit_on_phase(pile, pile_index)
-                            # self.sort_pile(self.player_list[n].hand)
 
                         #if not complete add any card
                         else:
@@ -1024,6 +1021,7 @@ class MyGame(arcade.Window):
                         # if other player phase pile has cards -- (meaning other player phase is complete)
                         if len(self.piles[pile_index]) > 0:
                             # is current player phase complete in order it "hit" on other players phase piles
+                            # Run check to see if phase is complete on current players turn
                             if self.player_list[n].phase_complete():
                                 self.player_list[n].complete = True
                                 self.sort_phase_pile()
@@ -1033,12 +1031,9 @@ class MyGame(arcade.Window):
                                 if self.player_list[p].phase in PHASE_2_MATS:
                                     if len(self.piles[pile_index]) > 5:
                                         self.compress_cards(pile, pile_index)
-                                    # if len(self.player_list[p].phase_pile_b) > 5:
-                                    #     self.compress_cards(self.pile_sprite, pile_index)
                                 # no need to sort if one big phase pile
                                 else:
                                     pass
-                                # self.sort_pile(self.player_list[n].hand)
 
                             # if not complete, return card
                             else:
@@ -1058,9 +1053,6 @@ class MyGame(arcade.Window):
                                 self.hit_on_phase(pile, pile_index)
                                 if len(self.piles[pile_index]) > 5:
                                     self.compress_cards(pile, pile_index)
-                                # if len(self.player_list[p].phase_pile_b) > 5:
-                                #     self.compress_cards(self.pile_sprite, pile_index)
-                                # self.sort_pile(self.player_list[n].hand)
 
                             # if not complete add any card
                             else:
@@ -1087,7 +1079,6 @@ class MyGame(arcade.Window):
                                             self.compress_cards(pile, pile_index)
                                     else:
                                         pass
-                                    # self.sort_pile(self.player_list[n].hand)
 
                                 # if not complete, return card 
                                 else:
@@ -1106,7 +1097,6 @@ class MyGame(arcade.Window):
                                 self.hit_on_phase(pile, pile_index)
                                 if len(self.piles[pile_index]) > 5:
                                     self.compress_cards(pile, pile_index)
-                                # self.sort_pile(self.player_list[n].hand)
 
                             # if not complete add any card
                             else:
@@ -1130,7 +1120,6 @@ class MyGame(arcade.Window):
                                     if self.player_list[p].phase in PHASE_2_MATS:
                                         if len(self.piles[pile_index]) > 5:
                                             self.compress_cards(pile, pile_index)
-                                    # self.sort_pile(self.player_list[n].hand)
 
                                 # if not complete, return card 
                                 else:
@@ -1150,19 +1139,15 @@ class MyGame(arcade.Window):
                     if len(self.piles[pile_index]) > 0:
                         top_card = self.piles[pile_index][-1]
                         for dropped_card in self.held_cards:
-                            # dropped_card.face_up()
                             dropped_card.position = top_card.position
                     else:
                         for dropped_card in self.held_cards:
-                            # dropped_card.face_up()
                             dropped_card.position = pile.position
-                    # self.pull_to_top(self.held_cards[-1])
                     for card in self.held_cards:
                         self.move_card_to_new_pile(card, pile_index)
 
                     self.discard()
                     self.sort_phase_pile()
-                    # self.sort_pile(self.player_list[n].hand)
                     self.end_turn(n)
 
                 else:
@@ -1204,7 +1189,7 @@ class MyGame(arcade.Window):
         """Add cards to phase pile"""
         self.pile_sprite = pile_sprite
         self.pile_index = pile_index
-        if len(self.piles[self.pile_index]) > 0: # add hitting method/check for comp phases? or if user.complete = True
+        if len(self.piles[self.pile_index]) > 0:
             # Move cards to proper position
             top_card = self.piles[self.pile_index][-1]
             for dropped_card in self.held_cards:
