@@ -75,13 +75,7 @@ MCOMP_HAND_PILE = 4
 RCOMP_HAND_PILE = 5
 PHASE_PILE_1 = 6
 PHASE_PILE_2 = 7
-# might not need rest
-# PHASE_PILE_3 = 8
-# PHASE_PILE_4 = 9
-# PHASE_PILE_5 = 10
-# PHASE_PILE_6 = 11
-# PHASE_PILE_7 = 12
-PHASE_PILE_8 = 13
+LAST_PHASE_PILE = 13
 
 # List of phases that require 1 or 2 mat piles
 PHASE_1_MATS = [4, 5, 6, 8]

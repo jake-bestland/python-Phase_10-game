@@ -1,12 +1,10 @@
 import arcade
-from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2, CARD_HORIZONTAL_OFFSET, DECK_FACE_DOWN_PILE
+from Phase_10_constants import PHASE_1_MATS, PHASE_2_MATS, PHASE_PILE_1, PHASE_PILE_2
 
 
-# add hand param. then in phase complete method, if false return cards to hand?
 class Player:
     def __init__(self, name, hand, phase=1, turn=False, score=0):  
         self.name = name
-        # self.player_number = player_number
         self.phase = phase
         self.hand = hand
         self.turn = turn
@@ -238,7 +236,6 @@ class Player:
                 self.score += card.get_points()
         else:
             pass
-        # print(self.score)
 
 ### use this class to create computter AI methods
 class Comp(Player):
