@@ -6,6 +6,8 @@ from typing import Optional
 import random
 import arcade
 import webbrowser
+
+import arcade.csscolor
 from player_class import Player
 
 # Screen title and size
@@ -433,9 +435,19 @@ class MyGame(arcade.Window):
                 38
             )
         
-        # Draw box to put around hands showing where to play skip card
-        # if self.held_cards[0].get_value() == "13":
-        #     arcade.draw_texture_rectangle
+        # Draw where to play skip card
+        skip_text = "* Drop Skip card on another player's hand *"
+        for card in self.held_cards:
+            if card.get_value() == "13":
+                arcade.draw_text(
+                    skip_text,
+                    875,
+                    DECK_Y,
+                    arcade.csscolor.BLACK,
+                    28,
+                    width=400,
+                    multiline=True
+                )
 
         # Draw instructions
         instruction_text = """\
