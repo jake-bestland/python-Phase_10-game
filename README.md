@@ -1,10 +1,21 @@
-### Phase_10
-A rummy-type card game for my capstone project
+<h1 align="center">
+  <br>
+  <img src="./images/card_back.png" alt="logo">
+  <br>
+  Phase 10
+  <br>
+</h1>
 
-This is currently an incompete game.  The game should eventually include a computer AI to play for the three other "computer" players.
-Currently, the game is user-controlled for all four players.
+<h4 align="center">A 2D rummy-type card game with a challenging twist.</h4>
 
-### Requirements
+<p align="center">
+    <img src="https://github.com/jake-bestland/django-portfolio-website/blob/main/media/images/gifs/Phase_10_gif.gif" alt="dashboard" width="700"/>
+</p>
+
+# About the game
+The game is named after the ten phases (or melds) a player must advance through to win. Built using the Python Arcade library, Phase 10 is a four player, all user-controlled, game.
+
+# Requirements
 
 All requirements are listed in the `requirements.txt` file.
 
@@ -14,7 +25,7 @@ Python 3.11.9
 ### Arcade Version
 arcade 2.6.17
 
-### Installation
+# Installation
 
 To install, clone the repo into a new folder, set up and activate a virtual environment, then install the using the following commands:
 ```shell
@@ -31,7 +42,7 @@ $ python phase_10.py
 ```
 
 
-### Instructions
+# Instructions
 OBJECT:
 
 To be the first player to complete all 10 Phases. In case of a tie, the player with the lowest score is the winner.
@@ -95,3 +106,7 @@ Or if you want to continue playing the game later, you can write down each playe
 (that feature can be added later - writing/reading file).
 In the `phase_10.py` file, on lines 163-166 (where the players are created) you can change which phase each player starts on, and/or you can manually enter
 their score (If you want to pick up where you left off).
+
+# Future improvements
+The game could eventually include a computer AI to play for the three other "computer" players.
+Currently, the game is user-controlled for all four players.
