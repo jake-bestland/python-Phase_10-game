@@ -12,7 +12,7 @@
     <img src="https://github.com/jake-bestland/django-portfolio-website/blob/main/media/images/gifs/Phase_10_gif.gif" alt="dashboard" width="700"/>
 </p>
 
-# About the game
+# About The Game
 The game is named after the ten phases (or melds) a player must advance through to win. Built using the Python Arcade library, Phase 10 is a four player, all user-controlled, game.
 
 # Requirements
@@ -42,12 +42,12 @@ $ python phase_10.py
 ```
 
 
-# Instructions
-OBJECT:
+# How To Play
+**OBJECT:**
 
 To be the first player to complete all 10 Phases. In case of a tie, the player with the lowest score is the winner.
 
-PLAY:
+**PLAY:**
 
 On your turn, draw one card, either from the top card from the draw pile or the top card from the discard pile.
 End your turn by discarding any one of your cards onto the top of the discard pile.  During the play of the firsthand,
@@ -67,31 +67,33 @@ These are the 10 phases:
 
 Each player can make only one Phase during each hand.  Phases must be completed in order, from 1 to 10.
 
-Definitions:
-Sets - A set is made of two or more cards with the same number.
-Runs - A run is made of four or more cards numbered in order
+**DEFINITIONS:**
 
-Wild cards:
+**Sets** - A set is made of two or more cards with the same number.
+
+**Runs** - A run is made of four or more cards numbered in order
+
+**Wild cards:**
 a "Wild" card may be used in place of a number card, or may be used as any color, in order to complete a Phase
 
-Skip cards - When played it will cause another player to lose a turn.
+**Skip cards:** When played it will cause another player to lose a turn.
 To use, drop the "Skip" card onto another players "hand".
 
-Making a Phase:
+**Making a Phase:**
 If during your turn, you are able to make a Phase with the cards in your hand, lay the Phase down in the empty space(s) near your hand before discarding.
 - You must have the whole Phase in hand before laying it down.
 - You may lay down more than the minimun requirements of a Phase, but only if the additional cards can be directly added to the cards already in the Phase pile.
 
-Hitting:
+**Hitting:**
 Hitting is the way to get rid of leftover cards after making a phase.  You may hit by putting a card directly on a Phase already laid down.
 The card must properly fit with the cards already laid down.  Before you can make a hit, your own Phase must already be laid down. You may hit on your own cards,
 another player's cards, or both.
 
-Finishing a round:
+**Finishing a round:**
 The first player to get rid of all the cards in their hand, wins the round.  the winner of the round and any other players who also complete their Phase, will
 advance to the next Phase.
 
-Scoring:
+**Scoring:**
 The winner of the round scores zero.  All remaining players score points against them, for cards still in their hand, as follows:
 - 5 points for each card numbered 1-9
 - 10 points for each card numbered 10-12
