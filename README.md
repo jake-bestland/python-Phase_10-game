@@ -27,12 +27,22 @@ arcade 2.6.17
 
 # Installation
 
-To install, clone the repo into a new folder, set up and activate a virtual environment, then install the using the following commands:
+To clone and run the game, create a new folder, then set up and activate a virtual environment.
 ```shell
-$ git clone git@github.com:jake-bestland/Phase_10.git
+# Example of setting up a virtual environment
+$ python3 -m venv venv
+$ source venv/bin/activate
+```
+
+Next, clone the repository and install the dependecies using the following commands:
+```shell
+# Clone this repository
+$ git clone https://github.com/jake-bestland/Phase_10.git
+
+# Go into the repository
 $ cd Phase_10
-$ python -m venv venv
-$ source ./venv/bin/activate
+
+# Install dependencies
 $ pip install -r requirements.txt
 ```
 
@@ -67,7 +77,7 @@ These are the 10 phases:
 
 Each player can make only one Phase during each hand.  Phases must be completed in order, from 1 to 10.
 
-**DEFINITIONS:**
+<ins>**DEFINITIONS:**</ins>
 
 **Sets** - A set is made of two or more cards with the same number.
 
@@ -100,15 +110,9 @@ The winner of the round scores zero.  All remaining players score points against
 - 15 points for each "Skip" card
 - 25 points for each "Wild" card
 
-
-
-# Fast forward/ Save place
-The game can take some time to complete.  If you do not want to play the whole length of the game, you can change which phase each player starts on.
-Or if you want to continue playing the game later, you can write down each players score and which Phase they're on and manually enter it before you start again.
-(that feature can be added later - writing/reading file).
-In the `phase_10.py` file, on lines 163-166 (where the players are created) you can change which phase each player starts on, and/or you can manually enter
-their score (If you want to pick up where you left off).
-
-# Future improvements
-The game could eventually include a computer AI to play for the three other "computer" players.
+# Future Improvements
+* The game could eventually include a computer AI to play for the three other "computer" players.
 Currently, the game is user-controlled for all four players.
+* Add a round 'recap' to illustrate which player(s) moved to next round and their scores.
+* Add a feature to save the game to be continued later.
+  - write/read file in the `phase_10.py` file on lines 163-166 (where players are created).
