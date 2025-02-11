@@ -53,11 +53,11 @@ $ python phase_10.py
 
 
 # How To Play
-**OBJECT:**
+### OBJECT:
 
 To be the first player to complete all 10 Phases. In case of a tie, the player with the lowest score is the winner.
 
-**PLAY:**
+### PLAY:
 
 On your turn, draw one card, either from the top card from the draw pile or the top card from the discard pile.
 End your turn by discarding any one of your cards onto the top of the discard pile.  During the play of the firsthand,
@@ -77,33 +77,125 @@ These are the 10 phases:
 
 Each player can make only one Phase during each hand.  Phases must be completed in order, from 1 to 10.
 
-<ins>**DEFINITIONS:**</ins>
+### DEFINITIONS:
 
-**Sets** - A set is made of two or more cards with the same number.
+<ins>**Sets**</ins> - A set is made of two or more cards with the same number.
 
-**Runs** - A run is made of four or more cards numbered in order
+<ins>**Runs**</ins> - A run is made of four or more cards numbered in order
 
-**Wild cards:**
+<details>
+    <summary>Example of a run and set.</summary>
+    <br>
+    <p>
+        <img src="./images/assets/Run_Set_example.png" alt="run_set_example"/>
+    </p>
+    <p>
+      <img src="./images/assets/Run_with_wild.png" alt="run_with_wild"/>
+    </p>
+    <br>
+</details>
+<br>
+
+<ins>**Wild cards:**</ins>
 a "Wild" card may be used in place of a number card, or may be used as any color, in order to complete a Phase
 
-**Skip cards:** When played it will cause another player to lose a turn.
+<ins>**Skip cards:**</ins>
+When played it will cause another player to lose a turn.
 To use, drop the "Skip" card onto another players "hand".
 
-**Making a Phase:**
+<details>
+  <summary>
+    Playing a skip card preview
+  </summary>
+<br>
+
+<p>
+  <img src="./images/assets/Skipping_player.gif" alt="playing_skip" width="650"/>
+</p>
+
+> Skipping Player 3 (red)
+</details>
+<br>
+
+<ins>**Making a Phase:**</ins>
 If during your turn, you are able to make a Phase with the cards in your hand, lay the Phase down in the empty space(s) near your hand before discarding.
 - You must have the whole Phase in hand before laying it down.
 - You may lay down more than the minimun requirements of a Phase, but only if the additional cards can be directly added to the cards already in the Phase pile.
 
-**Hitting:**
+<details>
+  <summary>
+    Preview of making a valid and invalid phase.
+  </summary>
+<br>
+
+- Player completing phase 4 (run of 7)
+<p>
+  <img src="./images/assets/Laying_run_wild.gif" alt="laying_run_gif" width="650"/>
+</p>
+
+> Player uses wild cards to complete the run, and is able to lay down more than the minimun requirement.
+>> after discarding, the wild cards will be sorted into the correct position of the completed phase.
+<br>
+
+- An incomplete or invalid phase will return cards back into the player's hand.
+
+<p>
+  <img src="./images/assets/Invalid_phase.gif" alt"invalid_phase" width="650"/>
+</p>
+
+> Invalid phase (above)
+<br>
+
+
+<p>
+  <img src="./images/assets/Incomplete_phase.gif" alt"invalid_phase" width="650"/>
+</p>
+
+> Incomplete phase (above)
+<br>
+
+</details>
+<br>
+
+<ins>**Hitting:**</ins>
 Hitting is the way to get rid of leftover cards after making a phase.  You may hit by putting a card directly on a Phase already laid down.
 The card must properly fit with the cards already laid down.  Before you can make a hit, your own Phase must already be laid down. You may hit on your own cards,
 another player's cards, or both.
 
-**Finishing a round:**
-The first player to get rid of all the cards in their hand, wins the round.  the winner of the round and any other players who also complete their Phase, will
+<details>
+  <summary>
+    Hitting Example
+  </summary>
+<br>
+  
+<p>
+  <img src="./images/assets/Hitting.gif" alt="hitting_example" width="650"/>
+</p>
+
+> Current player has completed their own phase, so they may play cards on another players' phase.
+<br>
+</details>
+<br>
+
+<ins>**Finishing a round:**</ins>
+The first player to get rid of all the cards in their hand, wins the round.  The winner of the round and any other players who also complete their Phase, will
 advance to the next Phase.
 
-**Scoring:**
+<details>
+  <summary>End of round preview</summary>
+  <br>
+  
+  <p>
+    <img src="./images/assets/Finish_round.gif" alt="finish_round" width="650"/>
+  </p>
+
+  > You can end a round by successfully placing your last card on a phase pile, or by discarding it (as shown here).
+  >> Scores and phases are automatically updated on the scoreboard and the next round begins.
+  <br>
+</details>
+<br>
+
+<ins>**Scoring:**</ins>
 The winner of the round scores zero.  All remaining players score points against them, for cards still in their hand, as follows:
 - 5 points for each card numbered 1-9
 - 10 points for each card numbered 10-12
