@@ -9,7 +9,7 @@
 <h4 align="center">A 2D rummy-type card game with a challenging twist.</h4>
 
 <p align="center">
-    <img src="https://github.com/jake-bestland/django-portfolio-website/blob/main/media/images/gifs/Phase_10_gif.gif" alt="dashboard" width="700"/>
+    <img src="./images/assets/Phase_10_gif.gif" alt="dashboard" width="700"/>
 </p>
 
 # About The Game
