@@ -155,7 +155,7 @@ If during your turn, you are able to make a Phase with the cards in your hand, l
   </summary>
 <br>
 
-- Player completing phase 4 (run of 7)
+- **Player completing phase 4 (run of 7)**
 <p>
   <img src="./images/assets/Laying_run_wild.gif" alt="laying_run_gif" width="650"/>
 </p>
@@ -164,7 +164,7 @@ If during your turn, you are able to make a Phase with the cards in your hand, l
 >> after discarding, the wild cards will be sorted into the correct position of the completed phase.
 <br>
 
-- An incomplete or invalid phase will return cards back into the player's hand.
+- **An incomplete or invalid phase will return cards back into the player's hand**
 
 <p>
   <img src="./images/assets/Invalid_phase.gif" alt"invalid_phase" width="650"/>
