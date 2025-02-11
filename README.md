@@ -130,20 +130,17 @@ a "Wild" card may be used in place of a number card, or may be used as any color
 <p>
   <img src="./images/black_cards/black14.png" alt="wild_card" width="50"/>
 </p>
-When played it will cause another player to lose a turn.
-To use, drop the "Skip" card onto another players "hand".
+When played it will cause another player to lose a turn.  To use, drop the "Skip" card onto another players "hand"
 
 <details>
-  <summary>
-    Playing a skip card preview
-  </summary>
-<br>
+  <summary>Playing a skip card preview</summary>
+  <br>
 
-<p>
-  <img src="./images/assets/Skipping_player.gif" alt="playing_skip" width="650"/>
-</p>
+  <p>
+    <img src="./images/assets/Skipping_player.gif" alt="playing_skip" width="650"/>
+  </p>
 
-> Skipping Player 3 (red)
+  > Skipping Player 3 (red)
 </details>
 <br>
 
@@ -203,7 +200,6 @@ another player's cards, or both.
 </p>
 
 > Current player has completed their own phase, so they may play cards on another players' phase.
-<br>
 </details>
 <br>
 
