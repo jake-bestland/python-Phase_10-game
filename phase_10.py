@@ -161,9 +161,9 @@ class Card(arcade.Sprite):
 
 # create players
 user = Player("user", USER_HAND_PILE, 1, True) # the user player located at the bottom
-lcomp = Player("lcomp", LCOMP_HAND_PILE, 1) # player located in the top left
-mcomp = Player("mcomp", MCOMP_HAND_PILE, 1) # player located in the top middle
-rcomp = Player("rcomp", RCOMP_HAND_PILE, 1) # player located in the top right
+lcomp = Player("lcomp", LCOMP_HAND_PILE, 1) # player located in the top left (left computer player - if AI)
+mcomp = Player("mcomp", MCOMP_HAND_PILE, 1) # player located in the top middle (middle computer player - if AI)
+rcomp = Player("rcomp", RCOMP_HAND_PILE, 1) # player located in the top right (right computer player - if AI)
 
 class MyGame(arcade.Window):
     """ Main application class. """
