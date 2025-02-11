@@ -160,10 +160,10 @@ class Card(arcade.Sprite):
         return not self.is_face_up
 
 # create players
-user = Player("user", USER_HAND_PILE, 1, True)
-lcomp = Player("lcomp", LCOMP_HAND_PILE, 1)
-mcomp = Player("mcomp", MCOMP_HAND_PILE, 1)
-rcomp = Player("rcomp", RCOMP_HAND_PILE, 1)
+user = Player("user", USER_HAND_PILE, 1, True) # the user player located at the bottom
+lcomp = Player("lcomp", LCOMP_HAND_PILE, 1) # player located in the top left
+mcomp = Player("mcomp", MCOMP_HAND_PILE, 1) # player located in the top middle
+rcomp = Player("rcomp", RCOMP_HAND_PILE, 1) # player located in the top right
 
 class MyGame(arcade.Window):
     """ Main application class. """
