@@ -121,9 +121,15 @@ A run is made of four or more cards numbered in order
 <br>
 
 ### <ins>Wild cards:</ins>
+<p>
+  <img src="./images/black_cards/black13.png" alt="wild_card" width="50"/>
+</p>
 a "Wild" card may be used in place of a number card, or may be used as any color, in order to complete a Phase
 
 ### <ins>Skip cards:</ins>
+<p>
+  <img src="./images/black_cards/black14.png" alt="wild_card" width="50"/>
+</p>
 When played it will cause another player to lose a turn.
 To use, drop the "Skip" card onto another players "hand".
 
